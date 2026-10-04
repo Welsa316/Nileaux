@@ -72,10 +72,10 @@
   font-weight: 400;
   font-size: 18px;
   line-height: 1;
-  letter-spacing: 0.26em;
+  letter-spacing: 0.34em;
   text-transform: uppercase;
   /* Optical: the trailing tracking of the last letter is trimmed. */
-  margin-right: -0.26em;
+  margin-right: -0.34em;
 }
 
 .nx-nav__links {

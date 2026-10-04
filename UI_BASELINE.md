@@ -13,13 +13,15 @@ use them. Extend it when a new convention is established. Do not override it cas
   `src/components/ScrollExpand/`. Theme it with more specific selectors from the section
   stylesheet, never by editing the component.
 - The hero media is a video that scroll scrubs; it never autoplays or loops. `Hero.tsx`
-  switches the element's autoplay and loop off before data arrives and, after
-  `loadedmetadata`, maps a scrubbed ScrollTrigger over the same track to `currentTime`
-  (first frame held through the opening 12%). Encodes for scrubbing live in
+  switches the element's autoplay and loop off before data arrives. Progress over the
+  track is rate-limited: a follower tracks raw scroll at no more than 1/5 of the travel
+  per second, and that value drives both `currentTime` (first frame held through the
+  opening 10%) and the type timeline, so the sequence takes at least five seconds however
+  fast the scroll. The type lockup is portalled into the component's sticky stage so it
+  is pinned and released by the same box as the frame. Encodes for scrubbing live in
   `public/video/` with a keyframe every six frames; a source with sparse keyframes will
   scrub choppily, so re-encode rather than mask it with easing. Desktop pins for 320vh,
-  phones for 220vh. The type lockup (name, headline, lede, actions) lives in the hero's
-  own sticky layer, not in the component's title prop. Reduced motion and video failure render the poster composition.
+  phones for 220vh. The media carries a static brightness/contrast filter; never animate it. Reduced motion and video failure render the poster composition.
 
 ## Registers
 

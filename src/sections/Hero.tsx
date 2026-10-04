@@ -1,32 +1,44 @@
 import { useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import gsap from 'gsap';
 import ScrollExpand from '../components/ScrollExpand/ScrollExpand';
-import { ensurePlugins, fontsSettled, prefersReducedMotion } from '../lib/motion';
+import { fontsSettled, prefersReducedMotion } from '../lib/motion';
 import { useMediaQuery } from '../lib/useMediaQuery';
 import './Hero.css';
 
-const VIDEO_LARGE = '/video/delta-dusk-1440.mp4';
-const VIDEO_DESKTOP = '/video/delta-dusk-1080.mp4';
-const VIDEO_MOBILE = '/video/delta-dusk-540.mp4';
-const POSTER = '/video/delta-dusk-poster.jpg';
-const POSTER_MOBILE = '/video/delta-dusk-poster-960.jpg';
+const VIDEO = {
+  uhd: '/video/delta-dusk-2160.mp4',
+  qhd: '/video/delta-dusk-1440.mp4',
+  fhd: '/video/delta-dusk-1080.mp4',
+  mobile: '/video/delta-dusk-540.mp4',
+};
+const POSTER = {
+  wide: '/video/delta-dusk-poster-2560.jpg',
+  standard: '/video/delta-dusk-poster.jpg',
+  mobile: '/video/delta-dusk-poster-960.jpg',
+};
+
+/** The film and the type take at least this long to run end to end, however fast the scroll. */
+const MIN_SECONDS = 5;
 
 /*
  * The hero is a cinematic opening: a framed still that comes alive as you scroll.
  * ScrollExpand owns the mask and the pin (CSS sticky over a track of
  * 1 + scrollDistance + holdDistance viewports). This component adds:
  *
- *   - the video, scrubbed by scroll rather than played: after `loadedmetadata`,
- *     a scrubbed ScrollTrigger over the same track maps progress to currentTime
- *     with a short lead-in so the first frame holds through the opening;
- *   - the type lockup in a sticky layer over the frame, written in by scroll:
- *     the name arrives first and alone, the slogan rises through a mask beneath
- *     it, then the lede and the actions, and it stays on the full-bleed shot;
+ *   - the type lockup, rendered through a portal into the component's own sticky
+ *     stage so it is pinned and released by exactly the same box as the frame;
+ *   - a rate-limited progress driver. Raw scroll progress over the track is the
+ *     target; a smoothed value follows it at no more than 1 / MIN_SECONDS per
+ *     second. That value sets the video's currentTime and the type timeline, so
+ *     a slow scroll is one to one and a fast flick still plays out over at least
+ *     MIN_SECONDS. The video never autoplays or loops; scroll is the transport;
  *   - a static poster composition for reduced motion and for video failure.
  *
  * Desktop pins for 320vh (mask over the first 260vh, a 60vh hold). Phones pin
- * for 220vh. The scrub encodes carry a keyframe every six frames; see public/video.
- * The source runs ten seconds; progress maps onto whatever duration the file reports.
+ * for 220vh. Sources are chosen by device pixels: 4K on dense screens from
+ * 1100 CSS px, 1440p on dense screens below that or very wide standard screens,
+ * 1080p otherwise, 540p on phones. All carry a keyframe every six frames.
  */
 function Lockup() {
   return (
@@ -65,21 +77,39 @@ function Lockup() {
 export default function Hero() {
   const ref = useRef<HTMLElement>(null);
   const compact = useMediaQuery('(max-width: 640px)');
-  // Wide or high-density screens get the 1440p encode; the 4K source is sharp enough to reward it.
-  const large = useMediaQuery('(min-width: 1200px) and (min-resolution: 1.5dppx), (min-width: 1800px)');
+  const dense = useMediaQuery('(min-resolution: 1.5dppx)');
+  const wide = useMediaQuery('(min-width: 1100px)');
+  const veryWide = useMediaQuery('(min-width: 1500px)');
   const reduced = useMediaQuery('(prefers-reduced-motion: reduce)');
   const [videoFailed, setVideoFailed] = useState(false);
+  const [stage, setStage] = useState<HTMLElement | null>(null);
   const isStatic = reduced || videoFailed;
-  const src = compact ? VIDEO_MOBILE : large ? VIDEO_LARGE : VIDEO_DESKTOP;
-  const poster = compact ? POSTER_MOBILE : POSTER;
 
-  // Video: never autoplays, never loops. Scroll is the transport.
+  const src = compact ? VIDEO.mobile : dense && wide ? VIDEO.uhd : dense || veryWide ? VIDEO.qhd : VIDEO.fhd;
+  const poster = compact ? POSTER.mobile : dense && wide ? POSTER.wide : POSTER.standard;
+
+  // The portal target: the component's sticky stage.
   useLayoutEffect(() => {
     const root = ref.current;
-    if (!root || isStatic) return;
+    setStage(root && !isStatic ? root.querySelector<HTMLElement>('.scroll-expand__stage') : null);
+  }, [isStatic]);
+
+  // Video setup, the opening, and the rate-limited driver for film and type.
+  useLayoutEffect(() => {
+    const root = ref.current;
+    if (!root || isStatic || !stage) return;
+
     const video = root.querySelector<HTMLVideoElement>('video.scroll-expand__media');
     const track = root.querySelector<HTMLElement>('.scroll-expand__track');
-    if (!video || !track) return;
+    const frame = root.querySelector<HTMLElement>('.scroll-expand__frame');
+    const media = root.querySelector<HTMLElement>('.scroll-expand__media');
+    const hint = root.querySelector<HTMLElement>('.scroll-expand__hint');
+    const brand = stage.querySelector<HTMLElement>('.nx-hero__brand');
+    const titleLine = stage.querySelector<HTMLElement>('.nx-hero__title-line');
+    const ledeLine = stage.querySelector<HTMLElement>('.nx-hero__lede-line');
+    const actions = stage.querySelector<HTMLElement>('.nx-hero__actions');
+    const nav = document.querySelectorAll<HTMLElement>('.nx-nav__brand, .nx-nav__link, .nx-nav__cta');
+    if (!video || !track || !frame || !brand || !titleLine || !ledeLine || !actions) return;
 
     // ScrollExpand renders the element with autoplay and loop; both are switched off
     // here before any media data arrives, so nothing ever plays on its own.
@@ -88,46 +118,81 @@ export default function Hero() {
     video.preload = 'auto';
     video.pause();
 
-    const ctx = gsap.context(() => {}, root);
+    const motion = !prefersReducedMotion();
+    const trackingRest = compact ? '0.3em' : '0.42em';
+    const trackingWide = compact ? '0.5em' : '0.62em';
     let cancelled = false;
     let lastTime = -1;
 
-    const build = async () => {
-      await ensurePlugins();
-      if (cancelled) return;
-      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
-      if (cancelled) return;
-      const duration = video.duration;
-      if (!Number.isFinite(duration) || duration <= 0) return;
+    // Pre-hide before paint. Nothing but the frame is visible at rest. The media is
+    // shifted down through the independent `translate` property (the component owns
+    // `transform`) so the braid in the upper third of the shot sits in the resting frame.
+    const ctx = gsap.context(() => {
+      gsap.set(frame, { opacity: 0, scale: 0.94, transformOrigin: '50% 50%' });
+      if (media) gsap.set(media, { translate: '0 10%' });
+      gsap.set(brand, { opacity: 0, letterSpacing: trackingWide, y: 10 });
+      gsap.set(titleLine, { yPercent: 112 });
+      gsap.set(ledeLine, { yPercent: 110 });
+      gsap.set(actions, { opacity: 0, y: 14, pointerEvents: 'none' });
+      if (hint) gsap.set(hint, { clipPath: 'inset(0 0 100% 0)' });
+      gsap.set(nav, { opacity: 0, y: -6 });
+    }, root);
 
-      ctx.add(() => {
-        const proxy = { p: 0 };
-        gsap.to(proxy, {
-          p: 1,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: track,
-            start: 'top top',
-            end: 'bottom bottom',
-            scrub: 0.3,
-            invalidateOnRefresh: true,
-          },
-          onUpdate() {
-            // Hold the first frame through the opening 10%, then advance to the end by 97%.
-            const t = duration * gsap.utils.clamp(0, 1, (proxy.p - 0.1) / 0.87);
-            if (Math.abs(t - lastTime) < 1 / 60) return;
-            lastTime = t;
-            video.currentTime = t;
-          },
-        });
-        ScrollTrigger.refresh();
-      });
+    // The type timeline is paused and driven by progress, not by a ScrollTrigger.
+    // Fractions are of the pinned travel. The mask is full at ~81%.
+    let typeTl: gsap.core.Timeline | null = null;
+    ctx.add(() => {
+      typeTl = gsap.timeline({ paused: true, defaults: { ease: 'none' } });
+      typeTl.to({}, { duration: 1 }, 0);
+      if (media) typeTl.to(media, { translate: '0 0%', duration: 0.8 }, 0);
+      typeTl
+        .to(brand, { opacity: 1, letterSpacing: trackingRest, y: 0, duration: 0.2, ease: 'power2.out' }, 0.24)
+        .to(titleLine, { yPercent: 0, duration: 0.16, ease: 'power3.out' }, 0.5)
+        .to(ledeLine, { yPercent: 0, duration: 0.14, ease: 'power3.out' }, 0.7)
+        .to(actions, { opacity: 1, y: 0, duration: 0.12, ease: 'power2.out' }, 0.82)
+        .set(actions, { pointerEvents: 'auto' }, 0.86);
+    });
+
+    // Raw scroll progress over the track, the same geometry the component uses.
+    const readTarget = () => {
+      const span = track.offsetHeight - window.innerHeight;
+      if (span <= 0) return 0;
+      return gsap.utils.clamp(0, 1, -track.getBoundingClientRect().top / span);
     };
 
-    const onMeta = () => void build();
+    const apply = (p: number) => {
+      typeTl?.progress(p);
+      const duration = video.duration;
+      if (video.readyState >= 1 && Number.isFinite(duration) && duration > 0) {
+        // Hold the first frame through the opening 10%, then advance to the end by 97%.
+        const t = duration * gsap.utils.clamp(0, 1, (p - 0.1) / 0.87);
+        if (Math.abs(t - lastTime) >= 1 / 60) {
+          lastTime = t;
+          video.currentTime = t;
+        }
+      }
+    };
+
+    // Rate-limited follower: at most 1 / MIN_SECONDS of the travel per second.
+    let smooth = readTarget();
+    let last = performance.now();
+    apply(smooth);
+    const tick = () => {
+      const now = performance.now();
+      const dt = Math.min(0.1, (now - last) / 1000);
+      last = now;
+      const target = readTarget();
+      const maxStep = motion ? dt / MIN_SECONDS : 1;
+      const delta = gsap.utils.clamp(-maxStep, maxStep, target - smooth);
+      if (delta === 0) return;
+      smooth += delta;
+      apply(smooth);
+    };
+    gsap.ticker.add(tick);
+
+    const onMeta = () => apply(smooth);
     const onError = () => setVideoFailed(true);
-    if (video.readyState >= 1) void build();
-    else video.addEventListener('loadedmetadata', onMeta, { once: true });
+    video.addEventListener('loadedmetadata', onMeta);
     video.addEventListener('error', onError);
 
     // iOS decodes seeked frames only after a gesture has touched the element once.
@@ -138,93 +203,37 @@ export default function Hero() {
     };
     window.addEventListener('touchstart', unlock, { once: true, passive: true });
 
-    return () => {
-      cancelled = true;
-      video.removeEventListener('loadedmetadata', onMeta);
-      video.removeEventListener('error', onError);
-      window.removeEventListener('touchstart', unlock);
-      ctx.revert();
-    };
-  }, [isStatic, src]);
-
-  // The opening shows only the frame. The type arrives with scroll: the name,
-  // then the headline rising through its mask beneath it, then the lede and
-  // the actions, and it stays on the full-bleed shot until the section releases.
-  useLayoutEffect(() => {
-    const root = ref.current;
-    if (!root || isStatic || prefersReducedMotion()) return;
-
-    const frame = root.querySelector<HTMLElement>('.scroll-expand__frame');
-    const media = root.querySelector<HTMLElement>('.scroll-expand__media');
-    const hint = root.querySelector<HTMLElement>('.scroll-expand__hint');
-    const track = root.querySelector<HTMLElement>('.scroll-expand__track');
-    const brand = root.querySelector<HTMLElement>('.nx-hero__brand');
-    const titleLine = root.querySelector<HTMLElement>('.nx-hero__title-line');
-    const ledeLine = root.querySelector<HTMLElement>('.nx-hero__lede-line');
-    const actions = root.querySelector<HTMLElement>('.nx-hero__actions');
-    const nav = document.querySelectorAll<HTMLElement>('.nx-nav__brand, .nx-nav__link, .nx-nav__cta');
-    if (!frame || !track || !brand || !titleLine || !ledeLine || !actions) return;
-
-    // Pre-hide before paint. Nothing but the frame is visible at rest. The media is
-    // shifted down through the independent `translate` property (the component owns
-    // `transform`) so the braid in the upper third of the shot sits in the resting frame.
-    const ctx = gsap.context(() => {
-      gsap.set(frame, { opacity: 0, scale: 0.94, transformOrigin: '50% 50%' });
-      if (media) gsap.set(media, { translate: '0 10%' });
-      gsap.set(brand, { opacity: 0, letterSpacing: '0.46em', y: 10 });
-      gsap.set(titleLine, { yPercent: 112 });
-      gsap.set(ledeLine, { yPercent: 110 });
-      gsap.set(actions, { opacity: 0, y: 14, pointerEvents: 'none' });
-      if (hint) gsap.set(hint, { clipPath: 'inset(0 0 100% 0)' });
-      gsap.set(nav, { opacity: 0, y: -6 });
-    }, root);
-
-    let cancelled = false;
-
-    const run = async () => {
-      await Promise.all([ensurePlugins(), fontsSettled()]);
+    // Opening: the frame settles, the chrome arrives. The river has the screen.
+    fontsSettled().then(() => {
       if (cancelled) return;
-
       ctx.add(() => {
-        // Opening: the frame settles, the chrome arrives. The river has the screen.
+        if (!motion) {
+          gsap.set([frame, hint, ...nav].filter(Boolean), { clearProps: 'opacity,transform,clipPath,y' });
+          return;
+        }
         const intro = gsap.timeline({ defaults: { ease: 'power3.out' } });
         intro
           .fromTo(frame, { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 1.8, ease: 'power2.out' }, 0)
           .to(nav, { opacity: 1, y: 0, duration: 0.9, stagger: 0.05 }, 0.3);
         if (hint) intro.to(hint, { clipPath: 'inset(0 0 0% 0)', duration: 0.8 }, 1.2);
-
-        // Scroll: as the frame opens and the scrim deepens, the type is written in.
-        // Fractions are of the pinned travel. The mask is full at ~81%.
-        const scroll = gsap.timeline({
-          defaults: { ease: 'none' },
-          scrollTrigger: { trigger: track, start: 'top top', end: 'bottom bottom', scrub: 0.3, invalidateOnRefresh: true },
-        });
-        scroll
-          .to({}, { duration: 1 }, 0);
-        if (media) scroll.to(media, { translate: '0 0%', duration: 0.8 }, 0);
-        scroll
-          .to(brand, { opacity: 1, letterSpacing: '0.26em', y: 0, duration: 0.2, ease: 'power2.out' }, 0.24)
-          .to(titleLine, { yPercent: 0, duration: 0.16, ease: 'power3.out' }, 0.5)
-          .to(ledeLine, { yPercent: 0, duration: 0.14, ease: 'power3.out' }, 0.7)
-          .to(actions, { opacity: 1, y: 0, duration: 0.12, ease: 'power2.out' }, 0.82)
-          .set(actions, { pointerEvents: 'auto' }, 0.86);
       });
-    };
-    void run();
+    });
 
     // A held page is a broken page. Release the frame and chrome regardless.
     const failsafe = window.setTimeout(() => {
-      ctx.add(() => {
-        gsap.set([frame, hint, ...nav].filter(Boolean), { clearProps: 'opacity,transform,clipPath,y' });
-      });
+      ctx.add(() => gsap.set([frame, hint, ...nav].filter(Boolean), { clearProps: 'opacity,transform,clipPath,y' }));
     }, 4000);
 
     return () => {
       cancelled = true;
       window.clearTimeout(failsafe);
+      gsap.ticker.remove(tick);
+      video.removeEventListener('loadedmetadata', onMeta);
+      video.removeEventListener('error', onError);
+      window.removeEventListener('touchstart', unlock);
       ctx.revert();
     };
-  }, [isStatic]);
+  }, [isStatic, src, stage, compact]);
 
   if (isStatic) {
     return (
@@ -242,11 +251,6 @@ export default function Hero() {
 
   return (
     <section ref={ref} id="top" className="nx-hero" data-register="dark" aria-label="Nileaux. Flow Further.">
-      {/* Sticky type layer: pinned with the stage, released with it. */}
-      <div className="nx-hero__layer">
-        <Lockup />
-      </div>
-
       <ScrollExpand
         className="nx-hero__expand"
         mediaType="video"
@@ -257,13 +261,22 @@ export default function Hero() {
         startHeight={compact ? 46 : 60}
         startRadius={22}
         endRadius={0}
-        mediaZoom={1.18}
+        mediaZoom={1.08}
         scrollDistance={compact ? 1.8 : 2.6}
         holdDistance={compact ? 0.4 : 0.6}
-        smoothing={0.04}
+        smoothing={0.35}
         overlayScrim={0.55}
         useWindowScroll
       />
+      {/* The type lives inside the component's sticky stage, pinned by the same box as the frame. */}
+      {stage
+        ? createPortal(
+            <div className="nx-hero__layer">
+              <Lockup />
+            </div>,
+            stage,
+          )
+        : null}
     </section>
   );
 }
