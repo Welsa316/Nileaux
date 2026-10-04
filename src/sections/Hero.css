@@ -17,7 +17,7 @@
 
 /* The video is never played; scroll sets its time. Poster covers loading. */
 .nx-hero .scroll-expand__media {
-  object-position: 50% 52%;
+  object-position: 50% 50%;
   background: var(--nx-midnight);
 }
 
@@ -118,7 +118,19 @@
   color: var(--nx-ivory);
   text-shadow: 0 1px 24px rgba(7, 21, 34, 0.5);
   text-wrap: balance;
-  will-change: opacity, transform;
+}
+
+/* Masked block: the lede rises into place through its own clip. */
+.nx-hero__lede-mask {
+  display: block;
+  overflow: hidden;
+  padding: 0.1em 0.2em 0.16em;
+  margin: -0.1em -0.2em -0.16em;
+}
+
+.nx-hero__lede-line {
+  display: block;
+  will-change: transform;
 }
 
 .nx-hero__actions {
@@ -157,7 +169,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 50% 52%;
+  object-position: 50% 50%;
 }
 
 .nx-hero__still-scrim {
@@ -178,10 +190,10 @@
     letter-spacing: -0.04em;
   }
 
-  /* Keep the delta in frame on a tall crop. */
+  /* The braid runs down the centre of the new shot; a centred tall crop keeps it. */
   .nx-hero .scroll-expand__media,
   .nx-hero__still img {
-    object-position: 50% 58%;
+    object-position: 50% 50%;
   }
 
   .nx-hero__layer {
