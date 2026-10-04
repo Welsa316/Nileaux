@@ -4,7 +4,7 @@ import ScrollExpand from '../components/ScrollExpand/ScrollExpand';
 import { fontsSettled, prefersReducedMotion } from '../lib/motion';
 import './Hero.css';
 
-const HERO_SRC = '/images/delta-dusk-2560.avif';
+const HERO_SRC = '/images/delta-dusk-1672.avif';
 
 export default function Hero() {
   const ref = useRef<HTMLElement>(null);
@@ -73,7 +73,7 @@ export default function Hero() {
       <ScrollExpand
         className="nx-hero__expand"
         src={HERO_SRC}
-        alt="Aerial view of tidal channels braiding across a delta at dusk"
+        alt="Aerial view of a river delta at dusk, its channels catching the last light"
         title="Flow Further."
         scrollHint="Scroll"
         startWidth={44}
