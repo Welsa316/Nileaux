@@ -1,8 +1,8 @@
 # Nileaux Convergence
 
-A standalone React section: seven channels become signals, the signals join one
-current, and that current becomes the Nileaux emblem. Nothing is wired into the
-homepage; the component is self-contained.
+A self-contained React section: seven channels become signals, the signals gather
+beneath the mark, rise as one river into its mouth, and the river becomes the
+Nileaux emblem. It is mounted on the homepage after the positioning section.
 
 ## Integration
 
@@ -25,7 +25,7 @@ Line colour is one CSS custom property, `--nc-line` (default `#c5a094`, a muted
 rose-bronze). Override it on `className`:
 
 ```css
-.myConvergence { --nc-line: #cfc2b8; --nc-travel: 220svh; }
+.myConvergence { --nc-line: #cfc2b8; --nc-travel: 320svh; }
 ```
 
 ## Preview without changing the app
@@ -41,7 +41,7 @@ preview tools only.
 ## The sequence
 
 One normalized GSAP timeline, scrubbed by one ScrollTrigger across a CSS-sticky
-stage: 240svh of travel on desktop, 170svh on phones.
+stage: 400svh of travel on desktop, 280svh on phones, so the whole sequence unfolds slowly.
 
 | Progress | Phase | What happens |
 | --- | --- | --- |
@@ -49,17 +49,21 @@ stage: 240svh of travel on desktop, 170svh on phones.
 | 12–35% | Activation | Each glyph starts along its own curve, staggered. Its line is drawn in its wake with stroke-dashoffset. |
 | 35–55% | Alignment | Glyphs ease to 0.68 opacity and 0.92 scale. Nothing dramatic. |
 | 55–68% | Dissolution | Each glyph becomes a single point of light that keeps travelling. |
-| 68–78% | Current | Three lines draw through the flow zone on the same diagonal the emblem's river takes. Tributaries dim underneath. "Different signals." |
-| 78–92% | Formation | The emblem's eight subpaths draw as strokes, in order: silhouette, inner ribbons, right crescent, star. Tributaries and current fade out beneath it (gone by 90%). The fill resolves over the strokes from 88%. |
+| 68–78% | River | Three lines rise out of the basin beneath the mark into the exact tips of its river ribbons. Tributaries dim underneath. "Different signals." |
+| 78–92% | Formation | The emblem's eight subpaths grow as strokes from their lowest points upward: the river first, the crescent as the silhouette's loop continues, then the right crescent and the star. Tributaries and river fade beneath it (gone by 92%). The fill resolves over the strokes from 90%. |
 | 92–100% | Resolution | Emblem alone, centred. "One system. One direction." then "Flow Further." |
 
 Geometry lives in two SVG coordinate systems (1200×700 desktop, 375×650 phone)
 so tributaries, current and emblem are composed against each other, not the
 viewport. The phone layout has its own five channels and shorter paths.
 
-The tributaries do not meet at one point. They enter a small flow zone at different
-positions and angles, and the current lines run through that zone along the river
-inside the emblem, so the mark draws over lines already heading its way.
+The emblem's river leaves the mark at its bottom right, so the composition is built
+around that mouth. Tributaries flow around the mark into a basin beneath it, entering
+at different positions and angles rather than one point. The river rises out of the
+basin into the ribbon tips, and the mark then climbs from the same place: each closed
+subpath is re-sequenced to begin at its lowest node and its stroke grows in both
+directions from there (a dash centred on the start, with the offset tracking half
+the dash length). Geometry is never altered; only the command order changes.
 
 ## Reduced motion and no JavaScript
 

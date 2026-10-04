@@ -5,11 +5,11 @@
   /* One line colour for glyphs, tributaries, current, and emblem. Muted rose-bronze. */
   --nc-line: #c5a094;
   --nc-gutter: clamp(24px, 5vw, 96px);
-  --nc-travel: 240svh;
+  --nc-travel: 400svh;
   /* Set from the composition's screen transform; 1 SVG unit = var(--nc-scale) px. */
   --nc-scale: 1;
-  /* Emblem bottom edge sits 145 units below centre on desktop (105 on mobile). */
-  --nc-emblem-drop: 145;
+  /* Emblem bottom edge sits 105 units below the box centre on desktop (75 on mobile). */
+  --nc-emblem-drop: 105;
   position: relative;
   isolation: isolate;
   inline-size: 100%;
@@ -61,7 +61,7 @@
 /* Default (no JS / reduced motion) is the resolved composition: faint glyphs and
    lines around a complete emblem. The timeline overrides these in scroll mode. */
 .path,
-.current {
+.river {
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
@@ -70,12 +70,12 @@
 /* Stroke widths are in user units per composition so dash lengths stay in the
    same space as getTotalLength(). Desktop renders at ~1.2px per unit at 1440. */
 .desktop .path,
-.desktop .current {
+.desktop .river {
   stroke-width: 0.85;
 }
 
 .mobile .path,
-.mobile .current {
+.mobile .river {
   stroke-width: 1;
 }
 
@@ -83,7 +83,7 @@
   opacity: 0.1;
 }
 
-.current {
+.river {
   opacity: 0;
 }
 
@@ -202,8 +202,8 @@
 
 @media (max-width: 700px) {
   .section {
-    --nc-travel: 170svh;
-    --nc-emblem-drop: 105;
+    --nc-travel: 280svh;
+    --nc-emblem-drop: 75;
   }
 
   .desktop {
@@ -268,7 +268,7 @@
   .section [data-intro],
   .section [data-middle],
   .section [data-scroll-cue],
-  .section [data-current-path] {
+  .section [data-river-path] {
     opacity: 0 !important;
   }
 

@@ -9,67 +9,83 @@ import AnalyticsGlyph from './glyphs/AnalyticsGlyph.jsx';
 import ConversionGlyph from './glyphs/ConversionGlyph.jsx';
 import CrmGlyph from './glyphs/CrmGlyph.jsx';
 import CreativeGlyph from './glyphs/CreativeGlyph.jsx';
-import { FULL, SUBPATHS, DRAW_ORDER, VIEWBOX } from './emblem/geometry.js';
+import { FULL, STROKE, DRAW_ORDER, VIEWBOX } from './emblem/geometry.js';
 import styles from './NileauxConvergence.module.css';
 
 const useBrowserLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
 /*
- * Everything shares one SVG coordinate system per breakpoint, so the tributaries,
- * the central current, and the emblem are composed against each other rather
- * than against the viewport. No layout is measured on scroll.
+ * Everything shares one SVG coordinate system per breakpoint, so tributaries,
+ * the river, and the emblem are composed against each other, never against the
+ * viewport. No layout is measured on scroll.
  *
- * Desktop box 1200x700, flow zone around (600, 350), emblem 290 units wide.
- * Mobile  box  375x650, flow zone around (187, 325), emblem 210 units wide.
+ * The emblem's river leaves the mark at its bottom right. In emblem units the
+ * three ribbon tips sit at roughly (700,955), (738,913) and (757,913). The
+ * composition is built around that mouth: the tributaries flow around the mark
+ * into a basin beneath it, the river rises out of the basin into the mouth, and
+ * the emblem's own strokes then grow upward from their lowest points.
  *
- * Tributaries end at different points on the rim of the flow zone and at
- * different angles. The current lines then run through the zone along the
- * same diagonal the emblem's river takes (upper left to lower right), so the
- * emblem draws on top of lines that are already heading its way.
+ * Desktop box 1200x700, emblem 290 units wide at (455,165), mouth near (661,430).
+ * Mobile  box  375x650, emblem 210 units wide at (82,190),  mouth near (231,380).
  */
 const DESKTOP = {
   viewBox: '0 0 1200 700',
-  emblem: { x: 455, y: 205, scale: 290 / 1024 },
-  current: [
-    'M470 300 C 530 300 560 345 612 362 S 660 400 680 450',
-    'M486 326 C 540 330 575 368 622 380 S 664 420 692 470',
-    'M500 280 C 556 282 590 322 636 340 S 672 376 690 416',
+  emblem: { x: 455, y: 165, scale: 290 / 1024 },
+  // From the basin up into the three ribbon tips.
+  river: [
+    'M616 582 C 640 548 648 500 653 436',
+    'M662 590 C 672 548 662 486 664 424',
+    'M706 584 C 690 548 680 492 669 424',
   ],
   channels: [
-    { name: 'search', Glyph: SearchGlyph, begin: 0.12, arrive: 0.70, d: 'M330 140 C 400 150 452 232 500 285' },
-    { name: 'social', Glyph: SocialGlyph, begin: 0.165, arrive: 0.735, d: 'M1040 130 C 952 196 764 214 690 300' },
-    { name: 'web', Glyph: WebGlyph, begin: 0.135, arrive: 0.71, d: 'M140 400 C 262 412 384 362 480 330' },
-    { name: 'analytics', Glyph: AnalyticsGlyph, begin: 0.195, arrive: 0.755, d: 'M1070 420 C 980 404 850 378 735 440' },
-    { name: 'conversion', Glyph: ConversionGlyph, begin: 0.15, arrive: 0.725, d: 'M210 590 C 330 602 442 520 560 395' },
-    { name: 'crm', Glyph: CrmGlyph, begin: 0.21, arrive: 0.765, d: 'M980 600 C 882 604 792 540 720 450' },
-    { name: 'creative', Glyph: CreativeGlyph, begin: 0.18, arrive: 0.745, d: 'M430 90 C 470 172 522 232 580 290' },
+    { name: 'search', Glyph: SearchGlyph, begin: 0.12, arrive: 0.70, d: 'M330 140 C 300 300 416 520 608 572' },
+    { name: 'social', Glyph: SocialGlyph, begin: 0.165, arrive: 0.735, d: 'M1040 130 C 980 270 896 486 704 574' },
+    { name: 'web', Glyph: WebGlyph, begin: 0.135, arrive: 0.71, d: 'M140 400 C 262 440 444 528 616 584' },
+    { name: 'analytics', Glyph: AnalyticsGlyph, begin: 0.195, arrive: 0.755, d: 'M1070 420 C 960 468 826 548 708 588' },
+    { name: 'conversion', Glyph: ConversionGlyph, begin: 0.15, arrive: 0.725, d: 'M210 590 C 330 626 486 624 624 594' },
+    { name: 'crm', Glyph: CrmGlyph, begin: 0.21, arrive: 0.765, d: 'M980 600 C 880 638 792 626 704 596' },
+    { name: 'creative', Glyph: CreativeGlyph, begin: 0.18, arrive: 0.745, d: 'M440 90 C 376 230 394 478 600 578' },
   ],
 };
 
 const MOBILE = {
   viewBox: '0 0 375 650',
-  emblem: { x: 82, y: 220, scale: 210 / 1024 },
-  current: [
-    'M96 290 C 138 290 160 322 198 334 S 232 362 246 398',
-    'M108 310 C 146 312 170 340 204 350 S 238 378 250 414',
+  emblem: { x: 82, y: 190, scale: 210 / 1024 },
+  river: [
+    'M216 520 C 226 488 226 440 226 388',
+    'M242 524 C 240 486 236 436 234 380',
   ],
   channels: [
-    { name: 'search', Glyph: SearchGlyph, begin: 0.12, arrive: 0.70, d: 'M44 118 C 90 112 118 212 140 275' },
-    { name: 'social', Glyph: SocialGlyph, begin: 0.17, arrive: 0.74, d: 'M326 126 C 300 190 262 226 240 282' },
-    { name: 'web', Glyph: WebGlyph, begin: 0.14, arrive: 0.715, d: 'M34 346 C 62 356 90 342 112 332' },
-    { name: 'analytics', Glyph: AnalyticsGlyph, begin: 0.2, arrive: 0.76, d: 'M340 392 C 312 380 288 362 264 352' },
-    { name: 'conversion', Glyph: ConversionGlyph, begin: 0.155, arrive: 0.73, d: 'M66 556 C 108 556 130 464 150 402' },
+    { name: 'search', Glyph: SearchGlyph, begin: 0.12, arrive: 0.70, d: 'M44 118 C 26 262 90 450 206 508' },
+    { name: 'social', Glyph: SocialGlyph, begin: 0.17, arrive: 0.74, d: 'M326 126 C 352 266 316 436 252 512' },
+    { name: 'web', Glyph: WebGlyph, begin: 0.14, arrive: 0.715, d: 'M34 346 C 92 410 150 480 214 518' },
+    { name: 'analytics', Glyph: AnalyticsGlyph, begin: 0.2, arrive: 0.76, d: 'M340 392 C 304 450 272 490 246 520' },
+    { name: 'conversion', Glyph: ConversionGlyph, begin: 0.155, arrive: 0.73, d: 'M70 556 C 118 560 180 548 224 526' },
   ],
+};
+
+// Formation, as fractions of the scroll: [start, duration]. River first, from
+// the mouth upward; crescent follows as the silhouette's loop continues; the
+// right crescent and the star complete it.
+const DRAW_PLAN = {
+  silhouette: [0.78, 0.11],
+  ribbonLower: [0.79, 0.06],
+  ribbonInner: [0.83, 0.06],
+  ribbonLeft: [0.845, 0.045],
+  crescentRightOuter: [0.855, 0.045],
+  crescentRightInner: [0.865, 0.04],
+  starOuter: [0.89, 0.03],
+  starInner: [0.9, 0.025],
 };
 
 function Emblem({ layout }) {
   const { x, y, scale } = layout.emblem;
   return (
     <g data-emblem transform={`translate(${x} ${y}) scale(${scale})`}>
-      {/* Stroke layer: the same geometry as lines, drawn one subpath at a time. */}
+      {/* Stroke layer: the same geometry as lines, each subpath growing from its lowest point. */}
       <g className={styles.emblemStroke} data-emblem-stroke>
         {DRAW_ORDER.map((key) => (
-          <path key={key} data-emblem-path={key} d={SUBPATHS[key]} />
+          <path key={key} data-emblem-path={key} d={STROKE[key]} />
         ))}
       </g>
       {/* Fill layer: the supplied emblem, untouched, resolving over the lines. */}
@@ -100,9 +116,9 @@ function Composition({ layout, mobile = false }) {
           </g>
         );
       })}
-      <g data-current>
-        {layout.current.map((d, i) => (
-          <path key={i} className={styles.current} data-current-path d={d} />
+      <g data-river>
+        {layout.river.map((d, i) => (
+          <path key={i} className={styles.river} data-river-path d={d} />
         ))}
       </g>
       <Emblem layout={layout} />
@@ -111,8 +127,9 @@ function Composition({ layout, mobile = false }) {
 }
 
 /**
- * One self-contained scroll section: seven channels become signals, join one
- * current, and that current becomes the Nileaux emblem.
+ * One self-contained scroll section: seven channels become signals, the signals
+ * gather beneath the mark, rise as one river into it, and the river becomes the
+ * Nileaux emblem.
  * reducedMotion=true forces the static composition; the OS preference always wins.
  * The default CSS state is the resolved composition, for no-JS and reduced motion.
  */
@@ -156,16 +173,18 @@ export default function NileauxConvergence({ className = '', reducedMotion = fal
           gsap.set(select('[data-middle], [data-final-copy], [data-tagline]'), { opacity: 0, y: 8 });
           gsap.set(inComposition('[data-emblem-fill]'), { opacity: 0 });
 
+          // Each emblem path starts invisible with a zero-length dash centred on
+          // its lowest node. The dash grows in both directions as the offset
+          // tracks half its length, so the line climbs the mark from the bottom.
           const emblemPaths = inComposition('[data-emblem-path]');
-          // Each emblem path stays invisible until its own draw begins; a zero-length
-          // dash with round caps would otherwise render as a stray dot at rest.
           emblemPaths.forEach((p) => {
             const length = p.getTotalLength();
-            gsap.set(p, { strokeDasharray: length, strokeDashoffset: length, opacity: 0 });
+            p.dataset.length = String(length);
+            gsap.set(p, { strokeDasharray: `0 ${length}`, strokeDashoffset: 0, opacity: 0 });
           });
 
-          const currentPaths = inComposition('[data-current-path]');
-          currentPaths.forEach((p) => {
+          const riverPaths = inComposition('[data-river-path]');
+          riverPaths.forEach((p) => {
             const length = p.getTotalLength();
             gsap.set(p, { strokeDasharray: length, strokeDashoffset: length, opacity: 0 });
           });
@@ -178,7 +197,7 @@ export default function NileauxConvergence({ className = '', reducedMotion = fal
               trigger: root,
               start: 'top top',
               end: 'bottom bottom',
-              scrub: 0.5,
+              scrub: 0.8,
               invalidateOnRefresh: true,
               onRefresh: syncScale,
             },
@@ -186,7 +205,7 @@ export default function NileauxConvergence({ className = '', reducedMotion = fal
           timeline.to({}, { duration: 1 }, 0);
 
           // 0–12% stillness · 12–35% activation · 35–55% alignment · 55–68% dissolution
-          // 68–78% current forms · 78–92% emblem draws · 92–100% resolution
+          // 68–78% river forms · 78–92% emblem climbs · 92–100% resolution
           layout.channels.forEach(({ name, d, begin, arrive }, index) => {
             const channel = composition.querySelector(`[data-channel="${name}"]`);
             const path = channel.querySelector('[data-path]');
@@ -213,43 +232,34 @@ export default function NileauxConvergence({ className = '', reducedMotion = fal
             timeline.to(signal, { opacity: 0.9, duration: 0.08 }, 0.56 + stagger);
             timeline.to(signal, { opacity: 0, duration: 0.05 }, arrive - 0.03);
 
-            // Tributary lines stay under the forming current, then fade as the emblem takes over.
+            // Tributaries stay beneath the rising river, then fade as the mark takes over.
             timeline.to(path, { opacity: 0.14, duration: 0.08 }, 0.72 + stagger * 0.5);
-            timeline.to(path, { opacity: 0, duration: 0.08 }, 0.82 + stagger * 0.5);
+            timeline.to(path, { opacity: 0, duration: 0.08 }, 0.84 + stagger * 0.5);
           });
 
-          // Central current: the tributaries' direction becomes a shared set of lines.
-          currentPaths.forEach((p, i) => {
-            timeline.to(p, { opacity: 0.6, duration: 0.03 }, 0.68 + i * 0.02);
+          // The river: out of the basin, up into the mouth of the mark.
+          riverPaths.forEach((p, i) => {
+            timeline.to(p, { opacity: 0.62, duration: 0.03 }, 0.68 + i * 0.02);
             timeline.to(p, { strokeDashoffset: 0, duration: 0.1, ease: 'power1.inOut' }, 0.68 + i * 0.02);
-            timeline.to(p, { opacity: 0, duration: 0.07 }, 0.84 + i * 0.015);
+            timeline.to(p, { opacity: 0, duration: 0.07 }, 0.86 + i * 0.015);
           });
 
-          // Emblem formation: each subpath draws in order, stroke first, fill resolving over it.
-          const drawPlan = {
-            silhouette: [0.78, 0.1],
-            ribbonInner: [0.81, 0.07],
-            ribbonLeft: [0.825, 0.05],
-            ribbonLower: [0.835, 0.065],
-            crescentRightOuter: [0.85, 0.05],
-            crescentRightInner: [0.86, 0.045],
-            starOuter: [0.885, 0.03],
-            starInner: [0.895, 0.025],
-          };
+          // Formation: each subpath climbs from its lowest node; the fill resolves over the strokes.
           emblemPaths.forEach((p) => {
-            const [at, duration] = drawPlan[p.dataset.emblemPath];
+            const [at, duration] = DRAW_PLAN[p.dataset.emblemPath];
+            const length = Number(p.dataset.length);
             timeline.to(p, { opacity: 1, duration: 0.008 }, at);
-            timeline.to(p, { strokeDashoffset: 0, duration, ease: 'power1.inOut' }, at);
+            timeline.to(p, { strokeDasharray: `${length} 0`, strokeDashoffset: length / 2, duration, ease: 'power1.inOut' }, at);
           });
-          timeline.to(inComposition('[data-emblem-fill]'), { opacity: 1, duration: 0.07, ease: 'power1.inOut' }, 0.88);
+          timeline.to(inComposition('[data-emblem-fill]'), { opacity: 1, duration: 0.07, ease: 'power1.inOut' }, 0.9);
 
           // Copy.
           timeline.to(select('[data-scroll-cue]'), { opacity: 0, duration: 0.06 }, 0.12);
           timeline.to(select('[data-intro]'), { opacity: 0, y: -6, duration: 0.1 }, 0.16);
           timeline.to(select('[data-middle]'), { opacity: 1, y: 0, duration: 0.05 }, 0.69);
           timeline.to(select('[data-middle]'), { opacity: 0, y: -6, duration: 0.05 }, 0.765);
-          timeline.to(select('[data-final-copy]'), { opacity: 1, y: 0, duration: 0.05 }, 0.93);
-          timeline.to(select('[data-tagline]'), { opacity: 1, y: 0, duration: 0.04 }, 0.96);
+          timeline.to(select('[data-final-copy]'), { opacity: 1, y: 0, duration: 0.05 }, 0.94);
+          timeline.to(select('[data-tagline]'), { opacity: 1, y: 0, duration: 0.04 }, 0.97);
 
           return () => {
             delete root.dataset.motion;

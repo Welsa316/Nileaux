@@ -36,8 +36,9 @@ Elevation on midnight comes from stepped surfaces and hairlines, never from shad
 Every section declares `data-register="dark"` or `"light"`. The nav reads the register of
 the band under its midline and flips its ink and band colour; button variants for the
 ivory register are scoped under `[data-register='light']` in `base.css`. Page order:
-midnight (hero, positioning) → ivory (acquisition) → midnight (system) → ivory (approach,
-work) → midnight (closing).
+ink (hero, positioning, convergence) → linen (acquisition) → ink (system) → linen (work)
+→ ink (closing). The convergence section is the standalone component in
+`NileauxConvergence/`, mounted from `App.tsx`.
 
 ## Typography
 
