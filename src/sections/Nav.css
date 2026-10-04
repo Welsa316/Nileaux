@@ -1,0 +1,85 @@
+.nx-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  height: var(--nx-nav-h);
+  color: var(--nx-ivory);
+  transition:
+    background-color var(--nx-base) var(--nx-ease),
+    box-shadow var(--nx-base) var(--nx-ease);
+}
+
+.nx-nav--stuck {
+  background: rgba(10, 16, 32, 0.72);
+  backdrop-filter: saturate(1.4) blur(14px);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px);
+  box-shadow: 0 1px 0 var(--nx-line-on-dark);
+}
+
+.nx-nav__inner {
+  height: 100%;
+  max-width: var(--nx-max);
+  margin: 0 auto;
+  padding: 0 var(--nx-gutter);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.nx-nav__brand {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+}
+
+.nx-wordmark {
+  font-family: var(--nx-sans);
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  /* Optical: the trailing tracking of the last letter is trimmed. */
+  margin-right: -0.3em;
+}
+
+.nx-nav__links {
+  display: flex;
+  gap: 36px;
+}
+
+.nx-nav__link {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--nx-ivory);
+  opacity: 0.84;
+  transition: opacity var(--nx-base) var(--nx-ease), background-size var(--nx-base) var(--nx-ease);
+}
+
+.nx-nav__link:hover {
+  opacity: 1;
+}
+
+.nx-nav__cta {
+  justify-self: end;
+}
+
+@media (max-width: 900px) {
+  .nx-nav__inner {
+    grid-template-columns: 1fr auto;
+  }
+
+  .nx-nav__links {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .nx-nav__cta {
+    height: 38px;
+    padding: 0 16px;
+    font-size: 12px;
+  }
+}

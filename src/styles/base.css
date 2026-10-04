@@ -1,0 +1,175 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: auto;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+body {
+  margin: 0;
+  background: var(--nx-midnight);
+  color: var(--nx-ivory);
+  font-family: var(--nx-sans);
+  font-size: var(--nx-body);
+  line-height: 1.5;
+  letter-spacing: -0.008em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  hyphens: none;
+  overflow-x: clip;
+}
+
+/* Very fine grain across the whole page. Reads as material, not as noise. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  mix-blend-mode: overlay;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+:focus-visible {
+  outline: 2px solid var(--nx-sand);
+  outline-offset: 4px;
+}
+
+::selection {
+  background: var(--nx-ivory);
+  color: var(--nx-midnight);
+}
+
+.nx-label {
+  font-family: var(--nx-mono);
+  font-size: var(--nx-label);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--nx-mist);
+}
+
+.nx-container {
+  width: 100%;
+  max-width: var(--nx-max);
+  margin: 0 auto;
+  padding: 0 var(--nx-gutter);
+}
+
+/* Buttons. Custom spacing and motion; hover changes colour in place, never lifts. */
+.nx-btn {
+  --btn-bg: transparent;
+  --btn-fg: var(--nx-ivory);
+  --btn-line: rgba(242, 238, 230, 0.32);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 24px;
+  border-radius: var(--nx-pill);
+  border: 1px solid var(--btn-line);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--nx-sans);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--nx-base) var(--nx-ease),
+    border-color var(--nx-base) var(--nx-ease),
+    color var(--nx-base) var(--nx-ease);
+}
+
+.nx-btn svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  transition: transform var(--nx-base) var(--nx-ease);
+}
+
+.nx-btn:hover svg {
+  transform: translateX(3px);
+}
+
+.nx-btn--solid {
+  --btn-bg: var(--nx-ivory);
+  --btn-fg: var(--nx-midnight);
+  --btn-line: var(--nx-ivory);
+}
+
+.nx-btn--solid:hover {
+  --btn-bg: var(--nx-white);
+  --btn-line: var(--nx-white);
+}
+
+.nx-btn--ghost:hover {
+  --btn-line: rgba(242, 238, 230, 0.8);
+}
+
+.nx-btn--sm {
+  height: 42px;
+  padding: 0 20px;
+  font-size: 13px;
+}
+
+/* Text link with an accent wipe that grows from the left and retracts to the right. */
+.nx-link {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  background-position: 100% 100%;
+  padding-bottom: 2px;
+  transition: background-size var(--nx-base) var(--nx-ease);
+}
+
+.nx-link:hover,
+.nx-link:focus-visible {
+  background-size: 100% 1px;
+  background-position: 0% 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
