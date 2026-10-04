@@ -28,6 +28,12 @@ scrims over photography and a faint horizon behind the hero frame.
 
 Elevation on midnight comes from stepped surfaces and hairlines, never from shadows.
 
+Every section declares `data-register="dark"` or `"light"`. The nav reads the register of
+the band under its midline and flips its ink and band colour; button variants for the
+ivory register are scoped under `[data-register='light']` in `base.css`. Page order:
+midnight (hero, positioning) → ivory (acquisition) → midnight (system) → ivory (approach,
+work) → midnight (closing).
+
 ## Typography
 
 - One family: Hanken Grotesk, weights 300 / 400 / 500. Geist Mono 400 / 500 for labels,
