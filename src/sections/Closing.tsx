@@ -57,7 +57,7 @@ export default function Closing() {
 
       <footer className="nx-footer">
         <div className="nx-container nx-footer__inner">
-          <span className="nx-wordmark">Nileaux</span>
+          <span className="nx-wordmark" role="img" aria-label="Nileaux">NILEΛUX</span>
           <span className="nx-footer__services nx-label">Google Ads · Meta Ads · Conversion · Lead tracking</span>
           <span className="nx-footer__legal nx-label">© 2026 Nileaux</span>
         </div>

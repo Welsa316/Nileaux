@@ -20,8 +20,8 @@ const POSTER_MOBILE = '/video/delta-dusk-poster-960.jpg';
  *     a scrubbed ScrollTrigger over the same track maps progress to currentTime
  *     with a short lead-in so the first frame holds through the opening;
  *   - the type lockup in a sticky layer over the frame, written in by scroll:
- *     the name arrives first, the headline rises through a mask beneath it,
- *     then the lede and the actions, and it stays on the full-bleed shot;
+ *     the name arrives first and alone, the slogan rises through a mask beneath
+ *     it, then the lede and the actions, and it stays on the full-bleed shot;
  *   - a static poster composition for reduced motion and for video failure.
  *
  * Desktop pins for 320vh (mask over the first 260vh, a 60vh hold). Phones pin
@@ -32,9 +32,10 @@ function Lockup() {
   return (
     <div className="nx-hero__lockup">
       <span className="nx-hero__brand" aria-hidden="true">
-        Nileaux
+        NILEΛUX
       </span>
       <h1 className="nx-hero__title">
+        <span className="nx-sr-only">Nileaux. </span>
         <span className="nx-hero__title-mask">
           <span className="nx-hero__title-line">Flow Further.</span>
         </span>
@@ -154,6 +155,7 @@ export default function Hero() {
     if (!root || isStatic || prefersReducedMotion()) return;
 
     const frame = root.querySelector<HTMLElement>('.scroll-expand__frame');
+    const media = root.querySelector<HTMLElement>('.scroll-expand__media');
     const hint = root.querySelector<HTMLElement>('.scroll-expand__hint');
     const track = root.querySelector<HTMLElement>('.scroll-expand__track');
     const brand = root.querySelector<HTMLElement>('.nx-hero__brand');
@@ -163,10 +165,13 @@ export default function Hero() {
     const nav = document.querySelectorAll<HTMLElement>('.nx-nav__brand, .nx-nav__link, .nx-nav__cta');
     if (!frame || !track || !brand || !titleLine || !ledeLine || !actions) return;
 
-    // Pre-hide before paint. Nothing but the frame is visible at rest.
+    // Pre-hide before paint. Nothing but the frame is visible at rest. The media is
+    // shifted down through the independent `translate` property (the component owns
+    // `transform`) so the braid in the upper third of the shot sits in the resting frame.
     const ctx = gsap.context(() => {
       gsap.set(frame, { opacity: 0, scale: 0.94, transformOrigin: '50% 50%' });
-      gsap.set(brand, { opacity: 0, letterSpacing: '0.7em', y: 6 });
+      if (media) gsap.set(media, { translate: '0 10%' });
+      gsap.set(brand, { opacity: 0, letterSpacing: '0.46em', y: 10 });
       gsap.set(titleLine, { yPercent: 112 });
       gsap.set(ledeLine, { yPercent: 110 });
       gsap.set(actions, { opacity: 0, y: 14, pointerEvents: 'none' });
@@ -195,12 +200,14 @@ export default function Hero() {
           scrollTrigger: { trigger: track, start: 'top top', end: 'bottom bottom', scrub: 0.3, invalidateOnRefresh: true },
         });
         scroll
-          .to({}, { duration: 1 }, 0)
-          .to(brand, { opacity: 1, letterSpacing: '0.34em', y: 0, duration: 0.14, ease: 'power2.out' }, 0.3)
-          .to(titleLine, { yPercent: 0, duration: 0.16, ease: 'power3.out' }, 0.4)
-          .to(ledeLine, { yPercent: 0, duration: 0.14, ease: 'power3.out' }, 0.54)
-          .to(actions, { opacity: 1, y: 0, duration: 0.12, ease: 'power2.out' }, 0.66)
-          .set(actions, { pointerEvents: 'auto' }, 0.7);
+          .to({}, { duration: 1 }, 0);
+        if (media) scroll.to(media, { translate: '0 0%', duration: 0.8 }, 0);
+        scroll
+          .to(brand, { opacity: 1, letterSpacing: '0.26em', y: 0, duration: 0.2, ease: 'power2.out' }, 0.24)
+          .to(titleLine, { yPercent: 0, duration: 0.16, ease: 'power3.out' }, 0.5)
+          .to(ledeLine, { yPercent: 0, duration: 0.14, ease: 'power3.out' }, 0.7)
+          .to(actions, { opacity: 1, y: 0, duration: 0.12, ease: 'power2.out' }, 0.82)
+          .set(actions, { pointerEvents: 'auto' }, 0.86);
       });
     };
     void run();

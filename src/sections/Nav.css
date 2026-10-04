@@ -68,13 +68,14 @@
 }
 
 .nx-wordmark {
-  font-family: var(--nx-sans);
-  font-weight: 500;
-  font-size: 15px;
-  letter-spacing: 0.3em;
+  font-family: var(--nx-serif);
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1;
+  letter-spacing: 0.26em;
   text-transform: uppercase;
   /* Optical: the trailing tracking of the last letter is trimmed. */
-  margin-right: -0.3em;
+  margin-right: -0.26em;
 }
 
 .nx-nav__links {

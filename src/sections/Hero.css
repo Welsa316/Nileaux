@@ -72,26 +72,29 @@
 }
 
 .nx-hero__brand {
-  font-family: var(--nx-sans);
-  font-weight: 500;
-  font-size: clamp(13px, 1.25vw, 18px);
-  letter-spacing: 0.34em;
+  font-family: var(--nx-serif);
+  font-weight: 400;
+  font-size: clamp(44px, 7.4vw, 128px);
+  line-height: 1;
+  letter-spacing: 0.26em;
   text-transform: uppercase;
-  color: var(--nx-mist);
+  color: var(--nx-ivory);
+  text-shadow: 0 2px 48px rgba(7, 21, 34, 0.45);
   /* Optical: trim the trailing tracking so the word sits centred. */
-  margin-right: -0.34em;
-  margin-bottom: clamp(18px, 2.6vw, 36px);
+  margin-right: -0.26em;
+  margin-bottom: clamp(16px, 2vw, 30px);
   will-change: opacity, transform, letter-spacing;
 }
 
+/* The slogan, beneath the mark. */
 .nx-hero__title {
   font-family: var(--nx-sans);
   font-weight: 300;
-  font-size: var(--nx-display);
-  letter-spacing: -0.045em;
-  line-height: 0.95;
+  font-size: clamp(26px, 3vw, 48px);
+  letter-spacing: -0.025em;
+  line-height: 1.05;
   color: var(--nx-ivory);
-  text-shadow: 0 2px 48px rgba(7, 21, 34, 0.45);
+  text-shadow: 0 2px 32px rgba(7, 21, 34, 0.45);
   will-change: opacity, transform;
 }
 
@@ -185,9 +188,15 @@
 }
 
 @media (max-width: 640px) {
+  .nx-hero__brand {
+    font-size: clamp(34px, 11.5vw, 56px);
+    letter-spacing: 0.2em;
+    margin-right: -0.2em;
+  }
+
   .nx-hero__title {
-    font-size: clamp(44px, 13.5vw, 72px);
-    letter-spacing: -0.04em;
+    font-size: clamp(24px, 7vw, 32px);
+    letter-spacing: -0.02em;
   }
 
   /* The braid runs down the centre of the new shot; a centred tall crop keeps it. */

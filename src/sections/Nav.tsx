@@ -65,7 +65,7 @@ export default function Nav() {
     <header ref={ref} className={cls}>
       <div className="nx-nav__inner">
         <a className="nx-nav__brand" href="#top" onClick={go} aria-label="Nileaux, back to top">
-          <span className="nx-wordmark">Nileaux</span>
+          <span className="nx-wordmark" aria-hidden="true">NILEΛUX</span>
         </a>
 
         <nav className="nx-nav__links" aria-label="Primary">

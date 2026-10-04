@@ -26,6 +26,8 @@
   /* Type */
   --nx-sans: 'Hanken Grotesk', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --nx-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  /* The wordmark: a high-contrast Didone. The A is set as a lambda, as in the mark. */
+  --nx-serif: 'Noto Serif Display', 'Bodoni Moda', Didot, 'Times New Roman', serif;
   --nx-display: clamp(56px, 9.5vw, 168px);
   --nx-h2: clamp(34px, 4.8vw, 76px);
   --nx-lede: clamp(18px, 1.4vw, 22px);
