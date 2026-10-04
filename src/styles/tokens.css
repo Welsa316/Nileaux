@@ -1,24 +1,26 @@
-/* Nileaux design tokens. Dark (midnight) is the opening register; ivory is the
+/* Nileaux design tokens. Palette: Ink Black 071522 / 111820, Cinnamon Wood B47E6A,
+   Dust Grey CFC2B8, Soft Linen F4F0E8. Ink is the opening register; linen is the
    secondary register used for light bands further down the page. */
 :root {
   /* Surfaces */
-  --nx-midnight: #0a1020;
-  --nx-navy: #101a2e;
-  --nx-navy-2: #162238;
-  --nx-ivory: #f2eee6;
-  --nx-ivory-2: #e9e4da;
+  --nx-midnight: #071522; /* Ink Black, deep */
+  --nx-navy: #111820; /* Ink Black, lifted */
+  --nx-navy-2: #1b232c; /* one more step up, for depth on ink */
+  --nx-ivory: #f4f0e8; /* Soft Linen */
+  --nx-ivory-2: #ebe5db; /* linen, one step toward dust */
   --nx-white: #ffffff;
 
   /* Ink */
-  --nx-ink: #0e1422;
-  --nx-ink-2: #3a4458;
-  --nx-mist: #a8b3c4; /* muted text on dark */
-  --nx-slate: #5e6b80; /* muted text on light */
-  --nx-sand: #c8bead; /* warm neutral, used sparingly */
+  --nx-ink: #071522;
+  --nx-ink-2: #3d434c; /* body copy on linen */
+  --nx-mist: #cfc2b8; /* Dust Grey: muted text on ink */
+  --nx-slate: #635d56; /* muted text on linen, dust darkened to pass contrast on both linen steps */
+  --nx-accent: #b47e6a; /* Cinnamon Wood: the one warm accent */
+  --nx-sand: var(--nx-accent);
 
   /* Hairlines */
-  --nx-line-on-dark: rgba(242, 238, 230, 0.14);
-  --nx-line-on-light: rgba(14, 20, 34, 0.12);
+  --nx-line-on-dark: rgba(244, 240, 232, 0.14);
+  --nx-line-on-light: rgba(7, 21, 34, 0.12);
 
   /* Type */
   --nx-sans: 'Hanken Grotesk', 'Helvetica Neue', Helvetica, Arial, sans-serif;

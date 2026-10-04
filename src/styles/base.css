@@ -93,7 +93,7 @@ img {
 .nx-btn {
   --btn-bg: transparent;
   --btn-fg: var(--nx-ivory);
-  --btn-line: rgba(242, 238, 230, 0.32);
+  --btn-line: rgba(244, 240, 232, 0.32);
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -140,7 +140,7 @@ img {
 }
 
 .nx-btn--ghost:hover {
-  --btn-line: rgba(242, 238, 230, 0.8);
+  --btn-line: rgba(244, 240, 232, 0.8);
 }
 
 /* Button variants inside an ivory band. */
@@ -157,11 +157,11 @@ img {
 
 [data-register='light'] .nx-btn--ghost {
   --btn-fg: var(--nx-ink);
-  --btn-line: rgba(14, 20, 34, 0.3);
+  --btn-line: rgba(7, 21, 34, 0.3);
 }
 
 [data-register='light'] .nx-btn--ghost:hover {
-  --btn-line: rgba(14, 20, 34, 0.8);
+  --btn-line: rgba(7, 21, 34, 0.8);
 }
 
 [data-register='light'] ::selection {

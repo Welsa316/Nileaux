@@ -7,7 +7,7 @@
    gradient behind it gives the field depth without decoration. */
 .nx-hero .scroll-expand__stage {
   background:
-    radial-gradient(120% 70% at 50% 120%, rgba(22, 34, 56, 0.9), rgba(10, 16, 32, 0) 60%),
+    radial-gradient(120% 70% at 50% 120%, rgba(27, 35, 44, 0.95), rgba(7, 21, 34, 0) 60%),
     var(--nx-midnight);
 }
 
@@ -17,7 +17,7 @@
 
 /* Scrim tinted to the brand midnight rather than pure black. */
 .nx-hero .scroll-expand__scrim {
-  background: linear-gradient(to top, rgba(10, 16, 32, 0.82), rgba(10, 16, 32, 0.18) 45%, rgba(10, 16, 32, 0.3));
+  background: linear-gradient(to top, rgba(7, 21, 34, 0.82), rgba(7, 21, 34, 0.18) 45%, rgba(7, 21, 34, 0.3));
 }
 
 /* Title: light weight, tight tracking, large. The component's size variable is
@@ -29,7 +29,7 @@
   letter-spacing: -0.045em;
   line-height: 0.95;
   color: var(--nx-ivory);
-  text-shadow: 0 2px 48px rgba(10, 16, 32, 0.45);
+  text-shadow: 0 2px 48px rgba(7, 21, 34, 0.45);
   will-change: opacity, transform, clip-path, translate;
 }
 
@@ -40,7 +40,7 @@
   font-weight: 500;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(168, 179, 196, 0.72);
+  color: rgba(207, 194, 184, 0.72);
   padding-top: 26px;
 }
 
@@ -51,7 +51,7 @@
   top: 0;
   width: 1px;
   height: 18px;
-  background: rgba(168, 179, 196, 0.5);
+  background: rgba(207, 194, 184, 0.5);
 }
 
 .nx-hero .scroll-expand__overlay {

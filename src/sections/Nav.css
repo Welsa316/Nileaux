@@ -12,7 +12,7 @@
 }
 
 .nx-nav--stuck {
-  background: rgba(10, 16, 32, 0.72);
+  background: rgba(7, 21, 34, 0.72);
   backdrop-filter: saturate(1.4) blur(14px);
   -webkit-backdrop-filter: saturate(1.4) blur(14px);
   box-shadow: 0 1px 0 var(--nx-line-on-dark);
@@ -28,7 +28,7 @@
 }
 
 .nx-nav--light.nx-nav--stuck {
-  background: rgba(242, 238, 230, 0.76);
+  background: rgba(244, 240, 232, 0.76);
   box-shadow: 0 1px 0 var(--nx-line-on-light);
 }
 
@@ -38,11 +38,11 @@
 
 .nx-nav--light .nx-nav__cta {
   --btn-fg: var(--nx-ink);
-  --btn-line: rgba(14, 20, 34, 0.3);
+  --btn-line: rgba(7, 21, 34, 0.3);
 }
 
 .nx-nav--light .nx-nav__cta:hover {
-  --btn-line: rgba(14, 20, 34, 0.8);
+  --btn-line: rgba(7, 21, 34, 0.8);
 }
 
 .nx-nav__inner {

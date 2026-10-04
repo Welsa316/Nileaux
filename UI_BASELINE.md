@@ -17,13 +17,18 @@ use them. Extend it when a new convention is established. Do not override it cas
 
 Two surfaces, each with its own ink:
 
+Palette: Ink Black #071522 and #111820, Cinnamon Wood #B47E6A, Dust Grey #CFC2B8, Soft
+Linen #F4F0E8.
+
 | Register | Surface | Primary ink | Muted ink | Hairline |
 | --- | --- | --- | --- | --- |
-| Midnight (opening) | `--nx-midnight` #0a1020, lifts to `--nx-navy` / `--nx-navy-2` | `--nx-ivory` | `--nx-mist` | `--nx-line-on-dark` |
-| Ivory (secondary) | `--nx-ivory` #f2eee6, lifts to `--nx-white` | `--nx-ink` | `--nx-slate` | `--nx-line-on-light` |
+| Ink (opening) | `--nx-midnight` #071522, lifts to `--nx-navy` #111820 / `--nx-navy-2` | `--nx-ivory` (linen) | `--nx-mist` (dust) | `--nx-line-on-dark` |
+| Linen (secondary) | `--nx-ivory` #f4f0e8, lifts to `--nx-white` | `--nx-ink` | `--nx-slate` (dust darkened to #635d56 for contrast) | `--nx-line-on-light` |
 
-`--nx-sand` is the only warm accent. It is reserved for focus rings and the occasional
-hairline. No green. No gold surfaces. No gradients as filler; the only gradients are
+`--nx-accent` (cinnamon) is the only warm accent. It appears as the system flow line and
+its nodes, the acquisition progress rule, and focus rings. Never as a surface, never on
+buttons. Dust grey at full strength is for text on ink only; on linen it fails contrast,
+so `--nx-slate` is used instead. No green. No gradients as filler; the only gradients are
 scrims over photography and a faint horizon behind the hero frame.
 
 Elevation on midnight comes from stepped surfaces and hairlines, never from shadows.

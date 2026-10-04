@@ -34,8 +34,8 @@ export default function Acquisition() {
     const rule = root.querySelector<HTMLElement>('.nx-acq__rule-fill');
     if (!track || words.length < 3) return;
 
-    const ink = getComputedStyle(root).getPropertyValue('--nx-ink').trim() || '#0e1422';
-    const faint = 'rgba(14, 20, 34, 0.16)';
+    const ink = getComputedStyle(root).getPropertyValue('--nx-ink').trim() || '#071522';
+    const faint = 'rgba(7, 21, 34, 0.16)';
 
     // Desktop only: pinned, scrubbed sequence. Phones get the plain stacked layout.
     const mm = gsap.matchMedia();
