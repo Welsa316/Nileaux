@@ -26,19 +26,6 @@
   background: linear-gradient(to top, rgba(7, 21, 34, 0.82), rgba(7, 21, 34, 0.18) 45%, rgba(7, 21, 34, 0.3));
 }
 
-/* Title: light weight, tight tracking, large. The component's size variable is
-   overridden by a more specific rule so the JSX stays untouched. */
-.nx-hero .scroll-expand__title {
-  font-family: var(--nx-sans);
-  font-weight: 300;
-  font-size: var(--nx-display);
-  letter-spacing: -0.045em;
-  line-height: 0.95;
-  color: var(--nx-ivory);
-  text-shadow: 0 2px 48px rgba(7, 21, 34, 0.45);
-  will-change: opacity, transform, clip-path, translate;
-}
-
 .nx-hero .scroll-expand__hint {
   bottom: 28px;
   font-family: var(--nx-mono);
@@ -60,7 +47,7 @@
   background: rgba(207, 194, 184, 0.5);
 }
 
-/* Sticky copy layer. Takes no space (negative margin), pins and releases with
+/* Sticky type layer. Takes no space (negative margin), pins and releases with
    the stage, and sits above the track. */
 .nx-hero__layer {
   position: sticky;
@@ -68,35 +55,80 @@
   z-index: 2;
   height: 100svh;
   margin-bottom: -100svh;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 0 var(--nx-gutter) clamp(28px, 5vh, 48px);
+  display: grid;
+  place-items: center;
+  padding: var(--nx-nav-h) var(--nx-gutter) 72px;
   pointer-events: none;
 }
 
-.nx-hero__copy {
+/* The lockup: name, headline, lede, actions. Centred over the frame. */
+.nx-hero__lockup {
   display: grid;
-  gap: 22px;
-  max-width: 30ch;
+  justify-items: center;
+  text-align: center;
+  gap: 0;
+  max-width: 1100px;
+  will-change: transform;
+}
+
+.nx-hero__brand {
+  font-family: var(--nx-sans);
+  font-weight: 500;
+  font-size: clamp(13px, 1.25vw, 18px);
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--nx-mist);
+  /* Optical: trim the trailing tracking so the word sits centred. */
+  margin-right: -0.34em;
+  margin-bottom: clamp(18px, 2.6vw, 36px);
+  will-change: opacity, transform, letter-spacing;
+}
+
+.nx-hero__title {
+  font-family: var(--nx-sans);
+  font-weight: 300;
+  font-size: var(--nx-display);
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+  color: var(--nx-ivory);
+  text-shadow: 0 2px 48px rgba(7, 21, 34, 0.45);
   will-change: opacity, transform;
 }
 
+/* Masked line: the headline rises into place through its own clip. */
+.nx-hero__title-mask {
+  display: block;
+  overflow: hidden;
+  padding: 0.04em 0.06em 0.08em;
+  margin: -0.04em -0.06em -0.08em;
+}
+
+.nx-hero__title-line {
+  display: block;
+  will-change: transform;
+}
+
 .nx-hero__lede {
-  font-size: clamp(17px, 1.3vw, 21px);
+  margin-top: clamp(20px, 2.8vw, 36px);
+  max-width: 34ch;
+  font-size: clamp(16px, 1.25vw, 20px);
   font-weight: 400;
-  line-height: 1.4;
-  letter-spacing: -0.012em;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
   color: var(--nx-ivory);
+  text-shadow: 0 1px 24px rgba(7, 21, 34, 0.5);
   text-wrap: balance;
+  will-change: opacity, transform;
 }
 
 .nx-hero__actions {
+  margin-top: clamp(22px, 2.6vw, 34px);
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 24px;
   pointer-events: auto;
+  will-change: opacity, transform;
 }
 
 .nx-hero__secondary {
@@ -106,13 +138,9 @@
   white-space: nowrap;
 }
 
-.nx-hero__meta {
-  text-align: right;
-  padding-bottom: 6px;
-}
-
 /* Static composition: reduced motion, or the video failed to load. */
 .nx-hero--static {
+  position: relative;
   min-height: 100svh;
 }
 
@@ -138,36 +166,14 @@
   background: linear-gradient(to top, rgba(7, 21, 34, 0.82), rgba(7, 21, 34, 0.18) 45%, rgba(7, 21, 34, 0.3));
 }
 
-.nx-hero__still-title {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 6%;
-  text-align: center;
-  font-size: var(--nx-display);
-  font-weight: 300;
-  line-height: 0.95;
-  letter-spacing: -0.045em;
-  color: var(--nx-ivory);
-}
-
 .nx-hero__layer--static {
   position: absolute;
-  inset: 0 0 auto;
+  inset: 0;
   margin-bottom: 0;
 }
 
-@media (max-width: 900px) {
-  .nx-hero__meta {
-    display: none;
-  }
-}
-
 @media (max-width: 640px) {
-  .nx-hero .scroll-expand__title,
-  .nx-hero__still-title {
+  .nx-hero__title {
     font-size: clamp(44px, 13.5vw, 72px);
     letter-spacing: -0.04em;
   }
@@ -179,19 +185,22 @@
   }
 
   .nx-hero__layer {
-    padding-bottom: 76px;
+    padding-bottom: 88px;
   }
 
-  .nx-hero__copy {
-    gap: 18px;
-    max-width: none;
+  .nx-hero__brand {
+    margin-bottom: 16px;
   }
 
   .nx-hero__lede {
+    margin-top: 18px;
     font-size: 16px;
+    max-width: 30ch;
   }
 
   .nx-hero__actions {
-    gap: 18px;
+    margin-top: 20px;
+    flex-direction: column;
+    gap: 16px;
   }
 }

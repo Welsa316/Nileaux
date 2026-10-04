@@ -16,6 +16,7 @@
   --nx-mist: #cfc2b8; /* Dust Grey: muted text on ink */
   --nx-slate: #635d56; /* muted text on linen, dust darkened to pass contrast on both linen steps */
   --nx-accent: #b47e6a; /* Cinnamon Wood: the one warm accent */
+  --nx-rose: #c5a094; /* rose bronze: the emblem's line and the hero's primary action */
   --nx-sand: var(--nx-accent);
 
   /* Hairlines */

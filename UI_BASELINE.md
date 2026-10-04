@@ -17,8 +17,9 @@ use them. Extend it when a new convention is established. Do not override it cas
   `loadedmetadata`, maps a scrubbed ScrollTrigger over the same track to `currentTime`
   (first frame held through the opening 12%). Encodes for scrubbing live in
   `public/video/` with a keyframe every six frames; a source with sparse keyframes will
-  scrub choppily, so re-encode rather than mask it with easing. Desktop pins for 180vh,
-  phones for 135vh. Reduced motion and video failure render the poster composition.
+  scrub choppily, so re-encode rather than mask it with easing. Desktop pins for 320vh,
+  phones for 220vh. The type lockup (name, headline, lede, actions) lives in the hero's
+  own sticky layer, not in the component's title prop. Reduced motion and video failure render the poster composition.
 
 ## Registers
 
@@ -32,9 +33,10 @@ Linen #F4F0E8.
 | Ink (opening) | `--nx-midnight` #071522, lifts to `--nx-navy` #111820 / `--nx-navy-2` | `--nx-ivory` (linen) | `--nx-mist` (dust) | `--nx-line-on-dark` |
 | Linen (secondary) | `--nx-ivory` #f4f0e8, lifts to `--nx-white` | `--nx-ink` | `--nx-slate` (dust darkened to #635d56 for contrast) | `--nx-line-on-light` |
 
-`--nx-accent` (cinnamon) is the only warm accent. It appears as the system flow line and
-its nodes, the acquisition progress rule, and focus rings. Never as a surface, never on
-buttons. Dust grey at full strength is for text on ink only; on linen it fails contrast,
+`--nx-accent` (cinnamon) appears as the system flow line and its nodes, the acquisition
+progress rule, and focus rings. `--nx-rose` (rose bronze, #c5a094) is the emblem's line in
+the convergence section and the fill of the hero's primary button (`.nx-btn--rose`, ink
+text at 7:1). Neither is ever a surface. Dust grey at full strength is for text on ink only; on linen it fails contrast,
 so `--nx-slate` is used instead. No green. No gradients as filler; the only gradients are
 scrims over photography and a faint horizon behind the hero frame.
 

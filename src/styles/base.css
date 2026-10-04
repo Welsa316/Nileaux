@@ -143,6 +143,18 @@ img {
   --btn-line: rgba(244, 240, 232, 0.8);
 }
 
+/* Rose bronze: the hero's primary action. Ink text keeps 7:1 on the fill. */
+.nx-btn--rose {
+  --btn-bg: var(--nx-rose);
+  --btn-fg: var(--nx-midnight);
+  --btn-line: var(--nx-rose);
+}
+
+.nx-btn--rose:hover {
+  --btn-bg: #d2b0a5;
+  --btn-line: #d2b0a5;
+}
+
 /* Button variants inside an ivory band. */
 [data-register='light'] .nx-btn--solid {
   --btn-bg: var(--nx-ink);

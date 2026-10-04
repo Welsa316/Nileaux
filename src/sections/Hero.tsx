@@ -12,27 +12,36 @@ const POSTER_MOBILE = '/video/delta-dusk-poster-960.jpg';
 
 /*
  * The hero is a cinematic opening: a framed still that comes alive as you scroll.
- * ScrollExpand owns the mask, the title lift and the pin (CSS sticky over a track
- * of 1 + scrollDistance + holdDistance viewports). This component adds:
+ * ScrollExpand owns the mask and the pin (CSS sticky over a track of
+ * 1 + scrollDistance + holdDistance viewports). This component adds:
  *
  *   - the video, scrubbed by scroll rather than played: after `loadedmetadata`,
  *     a scrubbed ScrollTrigger over the same track maps progress to currentTime
  *     with a short lead-in so the first frame holds through the opening;
- *   - the supporting copy, visible at rest in a sticky layer, easing out as the
- *     video takes the frame;
+ *   - the type lockup in a sticky layer over the frame: the name arrives first,
+ *     the headline rises through a mask beneath it, then the lede and the
+ *     actions. On scroll the lockup lifts away as the video takes the frame;
  *   - a static poster composition for reduced motion and for video failure.
  *
- * Desktop pins for 180vh (mask over the first 150vh, a 30vh hold). Phones pin for
- * 135vh. The scrub encodes carry a keyframe every six frames; see public/video.
+ * Desktop pins for 320vh (mask over the first 260vh, a 60vh hold). Phones pin
+ * for 220vh. The scrub encodes carry a keyframe every six frames; see public/video.
  */
-function HeroCopy() {
+function Lockup() {
   return (
-    <div className="nx-hero__copy">
+    <div className="nx-hero__lockup">
+      <span className="nx-hero__brand" aria-hidden="true">
+        Nileaux
+      </span>
+      <h1 className="nx-hero__title">
+        <span className="nx-hero__title-mask">
+          <span className="nx-hero__title-line">Flow Further.</span>
+        </span>
+      </h1>
       <p className="nx-hero__lede">
         Paid media, conversion, and the tracking between them. One system, built to move a business forward.
       </p>
       <div className="nx-hero__actions">
-        <a className="nx-btn nx-btn--solid" href="#contact">
+        <a className="nx-btn nx-btn--rose" href="#contact">
           Start a conversation
           <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M3 8h9.5M8.5 3.5 13 8l-4.5 4.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
@@ -91,12 +100,12 @@ export default function Hero() {
             trigger: track,
             start: 'top top',
             end: 'bottom bottom',
-            scrub: 0.2,
+            scrub: 0.3,
             invalidateOnRefresh: true,
           },
           onUpdate() {
-            // Hold the first frame through the opening 12%, then advance to the end.
-            const t = duration * gsap.utils.clamp(0, 1, (proxy.p - 0.12) / 0.86);
+            // Hold the first frame through the opening 10%, then advance to the end by 97%.
+            const t = duration * gsap.utils.clamp(0, 1, (proxy.p - 0.1) / 0.87);
             if (Math.abs(t - lastTime) < 1 / 60) return;
             lastTime = t;
             video.currentTime = t;
@@ -129,80 +138,115 @@ export default function Hero() {
     };
   }, [isStatic, src]);
 
-  // Copy choreography over the pinned travel, and the opening sequence.
+  // The opening sequence, then the lockup's choreography over the pinned travel.
   useLayoutEffect(() => {
     const root = ref.current;
     if (!root || isStatic || prefersReducedMotion()) return;
 
     const frame = root.querySelector<HTMLElement>('.scroll-expand__frame');
-    const title = root.querySelector<HTMLElement>('.scroll-expand__title');
     const hint = root.querySelector<HTMLElement>('.scroll-expand__hint');
     const track = root.querySelector<HTMLElement>('.scroll-expand__track');
-    const copy = root.querySelector<HTMLElement>('.nx-hero__copy');
-    const meta = root.querySelector<HTMLElement>('.nx-hero__meta');
+    const lockup = root.querySelector<HTMLElement>('.nx-hero__lockup');
+    const brand = root.querySelector<HTMLElement>('.nx-hero__brand');
+    const title = root.querySelector<HTMLElement>('.nx-hero__title');
+    const titleLine = root.querySelector<HTMLElement>('.nx-hero__title-line');
+    const lede = root.querySelector<HTMLElement>('.nx-hero__lede');
+    const actions = root.querySelector<HTMLElement>('.nx-hero__actions');
     const nav = document.querySelectorAll<HTMLElement>('.nx-nav__brand, .nx-nav__link, .nx-nav__cta');
-    if (!frame || !title || !track || !copy) return;
+    if (!frame || !track || !lockup || !brand || !title || !titleLine || !lede || !actions) return;
 
+    // Pre-hide before paint. The lede stays invisible until it has been split.
     const ctx = gsap.context(() => {
       gsap.set(frame, { opacity: 0, scale: 0.94, transformOrigin: '50% 50%' });
-      gsap.set(title, { clipPath: 'inset(0 0 100% 0)', translate: '0 0.22em' });
+      gsap.set(brand, { opacity: 0, letterSpacing: '0.7em', y: 6 });
+      gsap.set(titleLine, { yPercent: 112 });
+      gsap.set(lede, { autoAlpha: 0 });
+      gsap.set(actions, { opacity: 0, y: 14 });
       if (hint) gsap.set(hint, { clipPath: 'inset(0 0 100% 0)' });
-      gsap.set(copy, { opacity: 0, y: 14 });
-      if (meta) gsap.set(meta, { opacity: 0, y: 12 });
       gsap.set(nav, { opacity: 0, y: -6 });
     }, root);
 
     let cancelled = false;
+    let split: { revert: () => void } | null = null;
 
-    const reveal = () => {
-      ctx.add(() => {
-        const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-        tl.fromTo(frame, { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 1.7, ease: 'power2.out' }, 0)
-          .fromTo(
-            title,
-            { clipPath: 'inset(0 0 100% 0)', translate: '0 0.22em' },
-            { clipPath: 'inset(0 0 -12% 0)', translate: '0 0', duration: 1.5, ease: 'power4.out' },
-            0.45,
-          )
-          .to(nav, { opacity: 1, y: 0, duration: 0.9, stagger: 0.05 }, 0.3)
-          .to(copy, { opacity: 1, y: 0, duration: 0.9 }, 1.05);
-        if (meta) tl.to(meta, { opacity: 1, y: 0, duration: 0.8 }, 1.15);
-        if (hint) tl.to(hint, { clipPath: 'inset(0 0 0% 0)', duration: 0.8 }, 1.25);
-      });
-    };
-
-    // Scroll choreography for the copy. The mask, title and video follow the same track.
-    const choreograph = async () => {
-      await ensurePlugins();
+    const run = async () => {
+      await Promise.all([ensurePlugins(), fontsSettled()]);
       if (cancelled) return;
+      const { SplitText } = await import('gsap/SplitText');
+      if (cancelled) return;
+
       ctx.add(() => {
-        const tl = gsap.timeline({
-          defaults: { ease: 'none' },
-          scrollTrigger: { trigger: track, start: 'top top', end: 'bottom bottom', scrub: 0.2, invalidateOnRefresh: true },
+        // The opening: frame, name, headline, lede, actions, cue. One slow moment.
+        const intro = gsap.timeline({ defaults: { ease: 'power3.out' } });
+        intro
+          .fromTo(frame, { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 1.8, ease: 'power2.out' }, 0)
+          .to(nav, { opacity: 1, y: 0, duration: 0.9, stagger: 0.05 }, 0.3)
+          .to(brand, { opacity: 1, letterSpacing: '0.34em', y: 0, duration: 1.4, ease: 'power2.out' }, 0.5)
+          .to(titleLine, { yPercent: 0, duration: 1.3, ease: 'power4.out' }, 1.15);
+
+        // The lede's masked lines are revealed by the intro, not by a delayed tween
+        // inside onSplit: a re-split (resize, late font) during the opening would
+        // otherwise rebuild that tween and could show the lines early.
+        let ledeRevealed = false;
+        let ledeTween: gsap.core.Tween | null = null;
+        split = SplitText.create(lede, {
+          type: 'lines',
+          mask: 'lines',
+          autoSplit: true,
+          onSplit(self) {
+            if (ledeRevealed) {
+              gsap.set(self.lines, { yPercent: 0 });
+              return undefined;
+            }
+            ledeTween = gsap.fromTo(self.lines, { yPercent: 110 }, { yPercent: 0, duration: 1, ease: 'power4.out', stagger: 0.08, paused: true });
+            return ledeTween;
+          },
         });
-        tl.to({}, { duration: 1 }, 0);
-        tl.to(copy, { opacity: 0.72, duration: 0.4 }, 0.15);
-        tl.to(copy, { opacity: 0, y: -14, duration: 0.23, ease: 'power1.in' }, 0.55);
-        tl.set(copy, { pointerEvents: 'none' }, 0.78);
-        if (meta) tl.to(meta, { opacity: 0, duration: 0.25 }, 0.15);
+        intro.call(
+          () => {
+            ledeRevealed = true;
+            gsap.set(lede, { autoAlpha: 1 });
+            ledeTween?.play();
+          },
+          [],
+          1.85,
+        );
+
+        intro.to(actions, { opacity: 1, y: 0, duration: 0.9 }, 2.25);
+        if (hint) intro.to(hint, { clipPath: 'inset(0 0 0% 0)', duration: 0.8 }, 2.5);
+
+        // Scroll: the supporting copy steps back first, then the name and the
+        // headline lift away as the frame opens to full bleed.
+        const scroll = gsap.timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: { trigger: track, start: 'top top', end: 'bottom bottom', scrub: 0.3, invalidateOnRefresh: true },
+        });
+        scroll
+          .to({}, { duration: 1 }, 0)
+          .to([lede, actions], { opacity: 0.72, duration: 0.2 }, 0.1)
+          .to([lede, actions], { opacity: 0, y: -18, duration: 0.2, ease: 'power1.in' }, 0.3)
+          .set(actions, { pointerEvents: 'none' }, 0.5)
+          .to([brand, title], { opacity: 0, y: -36, duration: 0.28, ease: 'power1.in', stagger: 0.04 }, 0.42)
+          .to(lockup, { scale: 1.04, duration: 0.3, ease: 'power1.in' }, 0.42);
       });
     };
-
-    fontsSettled().then(() => {
-      if (!cancelled) reveal();
-    });
-    void choreograph();
+    void run();
 
     // A held page is a broken page. Release everything regardless of what fired.
     const failsafe = window.setTimeout(() => {
       ctx.add(() => {
-        gsap.set([frame, title, hint, copy, meta, ...nav].filter(Boolean), { clearProps: 'opacity,transform,translate,clipPath,y' });
+        split?.revert();
+        split = null;
+        gsap.set([frame, brand, titleLine, lede, actions, hint, ...nav].filter(Boolean), {
+          clearProps: 'opacity,visibility,transform,translate,clipPath,letterSpacing,y',
+        });
       });
-    }, 4000);
+    }, 5000);
 
     return () => {
       cancelled = true;
       window.clearTimeout(failsafe);
+      split?.revert();
       ctx.revert();
     };
   }, [isStatic]);
@@ -213,11 +257,9 @@ export default function Hero() {
         <div className="nx-hero__still">
           <img src={poster} alt="Aerial view of a river delta at dusk, its channels catching the last light" />
           <div className="nx-hero__still-scrim" />
-          <h1 className="nx-hero__still-title">Flow Further.</h1>
         </div>
         <div className="nx-hero__layer nx-hero__layer--static">
-          <HeroCopy />
-          <span className="nx-label nx-hero__meta">Paid media · Conversion · Analytics</span>
+          <Lockup />
         </div>
       </section>
     );
@@ -225,10 +267,9 @@ export default function Hero() {
 
   return (
     <section ref={ref} id="top" className="nx-hero" data-register="dark" aria-label="Nileaux. Flow Further.">
-      {/* Sticky copy layer: pinned with the stage, released with it. */}
+      {/* Sticky type layer: pinned with the stage, released with it. */}
       <div className="nx-hero__layer">
-        <HeroCopy />
-        <span className="nx-label nx-hero__meta" aria-hidden="true">Paid media · Conversion · Analytics</span>
+        <Lockup />
       </div>
 
       <ScrollExpand
@@ -236,15 +277,14 @@ export default function Hero() {
         mediaType="video"
         src={src}
         poster={poster}
-        title="Flow Further."
         scrollHint="Scroll"
         startWidth={compact ? 50 : 44}
         startHeight={compact ? 44 : 56}
         startRadius={22}
         endRadius={0}
         mediaZoom={1.18}
-        scrollDistance={compact ? 1.1 : 1.5}
-        holdDistance={compact ? 0.25 : 0.3}
+        scrollDistance={compact ? 1.8 : 2.6}
+        holdDistance={compact ? 0.4 : 0.6}
         smoothing={0.04}
         overlayScrim={0.55}
         useWindowScroll
