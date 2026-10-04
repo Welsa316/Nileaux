@@ -1,0 +1,3 @@
+preview/.cache/
+preview/dist/
+preview/*.timestamp-*.mjs

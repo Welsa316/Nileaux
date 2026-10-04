@@ -1,0 +1,285 @@
+.section {
+  --nc-background: var(--nx-midnight, #071522);
+  --nc-ivory: var(--nx-ivory, #f4f0e8);
+  --nc-muted: var(--nx-mist, #cfc2b8);
+  /* One line colour for glyphs, tributaries, current, and emblem. Muted rose-bronze. */
+  --nc-line: #c5a094;
+  --nc-gutter: clamp(24px, 5vw, 96px);
+  --nc-travel: 240svh;
+  /* Set from the composition's screen transform; 1 SVG unit = var(--nc-scale) px. */
+  --nc-scale: 1;
+  /* Emblem bottom edge sits 145 units below centre on desktop (105 on mobile). */
+  --nc-emblem-drop: 145;
+  position: relative;
+  isolation: isolate;
+  inline-size: 100%;
+  color: var(--nc-ivory);
+  background: var(--nc-background);
+  font-family: var(--nx-sans, 'Helvetica Neue', Helvetica, Arial, sans-serif);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+.section,
+.section * {
+  box-sizing: border-box;
+}
+
+.section[data-motion='scroll'] {
+  block-size: calc(100svh + var(--nc-travel));
+}
+
+.stage {
+  position: relative;
+  inline-size: 100%;
+  block-size: 100svh;
+  min-block-size: 560px;
+  overflow: hidden;
+  overflow: clip;
+}
+
+.section[data-motion='scroll'] .stage {
+  position: sticky;
+  inset-block-start: 0;
+  min-block-size: 0;
+}
+
+.signals {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: visible;
+  color: var(--nc-line);
+  pointer-events: none;
+}
+
+.mobile {
+  display: none;
+}
+
+/* Default (no JS / reduced motion) is the resolved composition: faint glyphs and
+   lines around a complete emblem. The timeline overrides these in scroll mode. */
+.path,
+.current {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+}
+
+/* Stroke widths are in user units per composition so dash lengths stay in the
+   same space as getTotalLength(). Desktop renders at ~1.2px per unit at 1440. */
+.desktop .path,
+.desktop .current {
+  stroke-width: 0.85;
+}
+
+.mobile .path,
+.mobile .current {
+  stroke-width: 1;
+}
+
+.path {
+  opacity: 0.1;
+}
+
+.current {
+  opacity: 0;
+}
+
+.glyph {
+  opacity: 0.26;
+}
+
+.signal {
+  fill: var(--nc-line);
+  opacity: 0;
+}
+
+.emblemStroke path {
+  fill: none;
+  stroke: currentColor;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0;
+}
+
+/* The emblem group is scaled down (290/1024 desktop, 210/1024 mobile), so its
+   stroke width is set in emblem units to land near 0.9px on screen. */
+.desktop .emblemStroke path {
+  stroke-width: 2.6;
+}
+
+.mobile .emblemStroke path {
+  stroke-width: 4.2;
+}
+
+.emblemFill {
+  fill: currentColor;
+  opacity: 1;
+}
+
+.editorial {
+  position: absolute;
+  inset-block-start: clamp(80px, 13svh, 160px);
+  inset-inline-start: var(--nc-gutter);
+  inset-inline-end: var(--nc-gutter);
+  pointer-events: none;
+}
+
+.intro,
+.middle {
+  position: absolute;
+  margin: 0;
+  font-size: clamp(22px, 2.2vw, 32px);
+  font-weight: 300;
+  line-height: 1.38;
+  letter-spacing: -0.018em;
+  opacity: 0;
+}
+
+.resolution {
+  position: absolute;
+  inset-block-start: calc(50% + (var(--nc-emblem-drop) * var(--nc-scale) * 1px) + 36px);
+  inset-inline: var(--nc-gutter);
+  text-align: center;
+  pointer-events: none;
+}
+
+.statement {
+  margin: 0;
+  font-size: clamp(21px, 2vw, 28px);
+  font-weight: 300;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+}
+
+.tagline {
+  margin: 18px 0 0;
+  color: var(--nc-muted);
+  font-family: var(--nx-mono, ui-monospace, Menlo, monospace);
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.scrollCue {
+  position: absolute;
+  inset-inline-start: var(--nc-gutter);
+  inset-block-end: clamp(32px, 7svh, 80px);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--nc-muted);
+  font-family: var(--nx-mono, ui-monospace, Menlo, monospace);
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cueLine {
+  inline-size: 40px;
+  block-size: 1px;
+  background: currentColor;
+  opacity: 0.45;
+}
+
+.srOnly {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 700px) {
+  .section {
+    --nc-travel: 170svh;
+    --nc-emblem-drop: 105;
+  }
+
+  .desktop {
+    display: none;
+  }
+
+  .mobile {
+    display: block;
+  }
+
+  .editorial {
+    inset-block-start: max(84px, 13svh);
+  }
+
+  .intro,
+  .middle {
+    font-size: clamp(20px, 5.5vw, 25px);
+    line-height: 1.42;
+  }
+
+  .resolution {
+    inset-inline: 20px;
+  }
+
+  .statement {
+    font-size: clamp(20px, 5.3vw, 24px);
+  }
+
+  .tagline {
+    margin-block-start: 14px;
+  }
+
+  .scrollCue {
+    inset-block-end: 40px;
+    font-size: 9px;
+  }
+}
+
+@media (max-height: 600px) {
+  .editorial {
+    inset-block-start: 44px;
+  }
+
+  .intro,
+  .middle {
+    font-size: 20px;
+  }
+}
+
+/* The resolved state is immediate if the OS preference changes before matchMedia's
+   JavaScript callback runs. The preference cannot be overridden by the prop. */
+@media (prefers-reduced-motion: reduce) {
+  .section[data-motion='scroll'] {
+    block-size: auto;
+  }
+
+  .section[data-motion='scroll'] .stage {
+    position: relative;
+    min-block-size: 560px;
+  }
+
+  .section [data-intro],
+  .section [data-middle],
+  .section [data-scroll-cue],
+  .section [data-current-path] {
+    opacity: 0 !important;
+  }
+
+  .section [data-emblem-fill],
+  .section [data-final-copy],
+  .section [data-tagline] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .section [data-emblem-path] {
+    opacity: 0 !important;
+  }
+}

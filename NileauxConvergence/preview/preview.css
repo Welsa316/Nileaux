@@ -1,0 +1,29 @@
+/* Preview chrome only. Do not import this file into the host website. */
+html { color-scheme: dark; background: #071522; }
+body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #f4f0e8; }
+button, input { font: inherit; }
+button, a, input { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid #c5a094; outline-offset: 5px; }
+.preview-toolbar { position: fixed; inset: 0 0 auto; z-index: 10; display: flex; justify-content: space-between; align-items: center; gap: 20px; min-height: 58px; padding: 0 28px; background: #071522ed; border-bottom: 1px solid #f4f0e80d; }
+.preview-brand { color: #f4f0e8; text-decoration: none; font-size: 11px; letter-spacing: 0.2em; }
+.preview-brand span { margin-left: 15px; color: #9ea9b5; font-size: 10px; letter-spacing: 0.04em; }
+.preview-controls { display: flex; align-items: center; gap: 22px; font-size: 10px; color: #bdc7d1; }
+.preview-static { display: flex; align-items: center; gap: 7px; cursor: pointer; }
+.preview-static input { accent-color: #c5a094; }
+.preview-controls button, .preview-boundary button { color: #bdc7d1; border: 1px solid #f4f0e82a; border-radius: 3px; padding: 8px 11px; background: transparent; cursor: pointer; }
+.preview-scrubber { position: fixed; z-index: 10; inset: auto 24px 18px auto; display: grid; grid-template-columns: 83px 150px 30px; align-items: center; gap: 12px; padding: 13px 16px; border: 1px solid #f4f0e818; border-radius: 4px; background: #071522f2; font-size: 10px; color: #bdc7d1; }
+.preview-scrubber input { width: 100%; accent-color: #bdc7d1; height: 2px; cursor: ew-resize; }
+.preview-scrubber output { font-variant-numeric: tabular-nums; text-align: right; }
+.preview-boundary { min-height: 38vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; background: #0d1625; padding: 80px 24px; }
+.preview-boundary span { font-size: 9px; text-transform: uppercase; letter-spacing: 0.2em; color: #9ea9b5; }
+.preview-boundary p { font-size: 20px; font-weight: 300; margin: 0; text-align: center; }
+.preview-boundary button { font-size: 11px; }
+.preview-unmounted { min-height: 85vh; display: grid; place-items: center; padding: 24px; font-size: 16px; text-align: center; color: #9ea9b5; }
+@media (max-width: 700px) {
+  .preview-toolbar { padding-inline: 16px; gap: 10px; min-height: 52px; }
+  .preview-brand { font-size: 9px; }
+  .preview-brand span { display: none; }
+  .preview-controls { gap: 10px; font-size: 9px; }
+  .preview-controls button { padding: 7px; }
+  .preview-scrubber { inset-inline: 16px; inset-block-end: 12px; grid-template-columns: 83px 1fr 30px; padding: 12px; }
+}
