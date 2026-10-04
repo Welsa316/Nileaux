@@ -69,7 +69,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section ref={ref} id="top" className="nx-hero" aria-label="Nileaux. Flow Further.">
+    <section ref={ref} id="top" className="nx-hero" data-register="dark" aria-label="Nileaux. Flow Further.">
       <ScrollExpand
         className="nx-hero__expand"
         src={HERO_SRC}

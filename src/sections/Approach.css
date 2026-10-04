@@ -1,0 +1,137 @@
+.nx-app {
+  position: relative;
+  background: var(--nx-ivory);
+  color: var(--nx-ink);
+  padding: var(--nx-section) 0;
+}
+
+.nx-app__head {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 6fr) minmax(0, 4fr);
+  column-gap: clamp(24px, 4vw, 64px);
+  row-gap: 28px;
+  align-items: start;
+}
+
+.nx-app__head .nx-label {
+  color: var(--nx-slate);
+  padding-top: 0.6em;
+}
+
+.nx-app__statement {
+  font-size: var(--nx-h2);
+  font-weight: 300;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  max-width: 12ch;
+}
+
+.nx-app__aside {
+  display: grid;
+  gap: 18px;
+  padding-top: 0.5em;
+}
+
+.nx-app__signal {
+  font-size: clamp(20px, 1.8vw, 26px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.nx-app__lede {
+  font-size: var(--nx-lede);
+  line-height: 1.5;
+  color: var(--nx-ink-2);
+  max-width: 36ch;
+}
+
+.nx-app__steps {
+  list-style: none;
+  margin: clamp(72px, 9vw, 128px) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid var(--nx-line-on-light);
+}
+
+.nx-app__step {
+  position: relative;
+  padding: 32px clamp(20px, 2.4vw, 36px) 40px 0;
+  border-right: 1px solid var(--nx-line-on-light);
+  display: grid;
+  gap: 18px;
+  align-content: start;
+  transition: background-color var(--nx-base) var(--nx-ease);
+}
+
+.nx-app__step + .nx-app__step {
+  padding-left: clamp(20px, 2.4vw, 36px);
+}
+
+.nx-app__step:last-child {
+  border-right: 0;
+}
+
+.nx-app__num {
+  font-family: var(--nx-mono);
+  font-size: var(--nx-label);
+  letter-spacing: 0.18em;
+  color: var(--nx-slate);
+}
+
+.nx-app__title {
+  font-size: clamp(40px, 4.2vw, 64px);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  margin-top: clamp(28px, 4vw, 72px);
+}
+
+.nx-app__copy {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--nx-ink-2);
+  max-width: 26ch;
+}
+
+@media (max-width: 900px) {
+  .nx-app__head {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 20px;
+  }
+
+  .nx-app__steps {
+    grid-template-columns: minmax(0, 1fr);
+    border-top: 0;
+  }
+
+  .nx-app__step,
+  .nx-app__step + .nx-app__step {
+    grid-template-columns: 48px minmax(0, 1fr);
+    grid-template-areas:
+      'num title'
+      'num copy';
+    column-gap: 8px;
+    row-gap: 10px;
+    padding: 28px 0;
+    border-right: 0;
+    border-top: 1px solid var(--nx-line-on-light);
+  }
+
+  .nx-app__num {
+    grid-area: num;
+    padding-top: 0.6em;
+  }
+
+  .nx-app__title {
+    grid-area: title;
+    margin-top: 0;
+    font-size: clamp(34px, 9vw, 48px);
+  }
+
+  .nx-app__copy {
+    grid-area: copy;
+    max-width: none;
+  }
+}

@@ -18,6 +18,33 @@
   box-shadow: 0 1px 0 var(--nx-line-on-dark);
 }
 
+/* Over an ivory band the nav flips its ink and its band colour. */
+.nx-nav--light {
+  color: var(--nx-ink);
+  transition:
+    color var(--nx-base) var(--nx-ease),
+    background-color var(--nx-base) var(--nx-ease),
+    box-shadow var(--nx-base) var(--nx-ease);
+}
+
+.nx-nav--light.nx-nav--stuck {
+  background: rgba(242, 238, 230, 0.76);
+  box-shadow: 0 1px 0 var(--nx-line-on-light);
+}
+
+.nx-nav--light .nx-nav__link {
+  color: var(--nx-ink);
+}
+
+.nx-nav--light .nx-nav__cta {
+  --btn-fg: var(--nx-ink);
+  --btn-line: rgba(14, 20, 34, 0.3);
+}
+
+.nx-nav--light .nx-nav__cta:hover {
+  --btn-line: rgba(14, 20, 34, 0.8);
+}
+
 .nx-nav__inner {
   height: 100%;
   max-width: var(--nx-max);
@@ -60,7 +87,10 @@
   font-weight: 400;
   color: var(--nx-ivory);
   opacity: 0.84;
-  transition: opacity var(--nx-base) var(--nx-ease), background-size var(--nx-base) var(--nx-ease);
+  transition:
+    opacity var(--nx-base) var(--nx-ease),
+    color var(--nx-base) var(--nx-ease),
+    background-size var(--nx-base) var(--nx-ease);
 }
 
 .nx-nav__link:hover {

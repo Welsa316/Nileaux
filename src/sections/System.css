@@ -1,0 +1,184 @@
+.nx-sys {
+  position: relative;
+  background: var(--nx-midnight);
+  color: var(--nx-ivory);
+  padding: var(--nx-section) 0;
+  overflow: hidden;
+}
+
+.nx-sys__head {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 10fr);
+  column-gap: clamp(24px, 4vw, 64px);
+  row-gap: 28px;
+  align-items: start;
+}
+
+.nx-sys__head .nx-label {
+  padding-top: 0.6em;
+}
+
+.nx-sys__statement {
+  grid-column: 2;
+  max-width: 14ch;
+  font-size: var(--nx-h2);
+  font-weight: 300;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.nx-sys__lede {
+  grid-column: 2;
+  max-width: 44ch;
+  font-size: var(--nx-lede);
+  line-height: 1.5;
+  color: var(--nx-mist);
+}
+
+.nx-sys__field {
+  position: relative;
+  margin-top: clamp(72px, 10vw, 140px);
+  aspect-ratio: 1200 / 400;
+}
+
+.nx-sys__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.nx-sys__svg--tall {
+  display: none;
+}
+
+.nx-sys__path {
+  fill: none;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.nx-sys__path--main {
+  stroke: var(--nx-ivory);
+  stroke-width: 1.25;
+}
+
+.nx-sys__path--ghost {
+  stroke: rgba(242, 238, 230, 0.22);
+  stroke-width: 1;
+}
+
+.nx-sys__nodes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  inset: 0;
+}
+
+.nx-sys__node {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.nx-sys__dot {
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--nx-midnight);
+  border: 1px solid var(--nx-ivory);
+}
+
+.nx-sys__dot::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: var(--nx-ivory);
+}
+
+.nx-sys__text {
+  position: absolute;
+  width: 200px;
+  display: grid;
+  gap: 4px;
+}
+
+/* Side is chosen per node from the slope of the line (see System.tsx). */
+.nx-sys__node[data-side$='-right'] .nx-sys__text {
+  left: 18px;
+}
+
+.nx-sys__node[data-side$='-left'] .nx-sys__text {
+  right: 18px;
+  text-align: right;
+}
+
+.nx-sys__node[data-side^='above'] .nx-sys__text {
+  bottom: 12px;
+}
+
+.nx-sys__node[data-side^='below'] .nx-sys__text {
+  top: 12px;
+}
+
+.nx-sys__index {
+  font-family: var(--nx-mono);
+  font-size: var(--nx-label);
+  letter-spacing: 0.18em;
+  color: var(--nx-mist);
+}
+
+.nx-sys__label {
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.nx-sys__sub {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--nx-mist);
+}
+
+@media (max-width: 900px) {
+  .nx-sys__head {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 20px;
+  }
+
+  .nx-sys__statement,
+  .nx-sys__lede {
+    grid-column: 1;
+  }
+
+  .nx-sys__field {
+    aspect-ratio: auto;
+    height: 720px;
+    width: 120px;
+    margin-left: 0;
+  }
+
+  .nx-sys__svg--wide {
+    display: none;
+  }
+
+  .nx-sys__svg--tall {
+    display: block;
+  }
+
+  .nx-sys__node[data-side='right'] .nx-sys__text {
+    top: 0;
+    bottom: auto;
+    right: auto;
+    width: calc(100vw - (2 * var(--nx-gutter)) - 150px);
+    transform: translateY(-50%);
+    text-align: left;
+  }
+}
