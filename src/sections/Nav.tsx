@@ -46,7 +46,8 @@ export default function Nav() {
         </nav>
 
         <a className="nx-btn nx-btn--ghost nx-btn--sm nx-nav__cta" href="#contact" onClick={go}>
-          Start a conversation
+          <span className="nx-nav__cta-long">Start a conversation</span>
+          <span className="nx-nav__cta-short">Contact</span>
         </a>
       </div>
     </header>
