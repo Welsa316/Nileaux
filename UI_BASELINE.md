@@ -12,6 +12,13 @@ use them. Extend it when a new convention is established. Do not override it cas
 - The hero expansion is the React Bits `ScrollExpand` component, kept verbatim in
   `src/components/ScrollExpand/`. Theme it with more specific selectors from the section
   stylesheet, never by editing the component.
+- The hero media is a video that scroll scrubs; it never autoplays or loops. `Hero.tsx`
+  switches the element's autoplay and loop off before data arrives and, after
+  `loadedmetadata`, maps a scrubbed ScrollTrigger over the same track to `currentTime`
+  (first frame held through the opening 12%). Encodes for scrubbing live in
+  `public/video/` with a keyframe every six frames; a source with sparse keyframes will
+  scrub choppily, so re-encode rather than mask it with easing. Desktop pins for 180vh,
+  phones for 135vh. Reduced motion and video failure render the poster composition.
 
 ## Registers
 
