@@ -56,7 +56,8 @@ const MOBILE = {
     'M242 524 C 240 486 236 436 234 380',
   ],
   channels: [
-    { name: 'search', Glyph: SearchGlyph, begin: 0.12, arrive: 0.70, d: 'M44 118 C 26 262 90 450 206 508' },
+    // Starts below the intro copy's band so the two never meet on short phones.
+    { name: 'search', Glyph: SearchGlyph, begin: 0.12, arrive: 0.70, d: 'M58 214 C 30 320 92 456 206 508' },
     { name: 'social', Glyph: SocialGlyph, begin: 0.17, arrive: 0.74, d: 'M326 126 C 352 266 316 436 252 512' },
     { name: 'web', Glyph: WebGlyph, begin: 0.14, arrive: 0.715, d: 'M34 346 C 92 410 150 480 214 518' },
     { name: 'analytics', Glyph: AnalyticsGlyph, begin: 0.2, arrive: 0.76, d: 'M340 392 C 304 450 272 490 246 520' },

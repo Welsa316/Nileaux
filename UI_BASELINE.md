@@ -17,7 +17,9 @@ use them. Extend it when a new convention is established. Do not override it cas
   track is rate-limited: a follower tracks raw scroll at no more than 1/5 of the travel
   per second, and that value drives both `currentTime` (first frame held through the
   opening 10%) and the type timeline, so the sequence takes at least five seconds however
-  fast the scroll. The type lockup is portalled into the component's sticky stage so it
+  fast the scroll (2.5 s on coarse pointers). The type also has a floor tied to raw scroll
+  so it is fully written by 92% of the travel: a flick can never clear the hero before the
+  name has appeared. Phones bring the type in earlier and pin for 280vh. The type lockup is portalled into the component's sticky stage so it
   is pinned and released by the same box as the frame. Encodes for scrubbing live in
   `public/video/` with a keyframe every six frames; a source with sparse keyframes will
   scrub choppily, so re-encode rather than mask it with easing. Desktop pins for 320vh,

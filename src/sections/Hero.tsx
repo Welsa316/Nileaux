@@ -18,8 +18,10 @@ const POSTER = {
   mobile: '/video/delta-dusk-poster-960.jpg',
 };
 
-/** The film and the type take at least this long to run end to end, however fast the scroll. */
+/** The film takes at least this long to run end to end, however fast the scroll. */
 const MIN_SECONDS = 5;
+/** Touch flicks clear a section in a second; the cap is shorter there so the type is seen. */
+const MIN_SECONDS_TOUCH = 2.5;
 
 /*
  * The hero is a cinematic opening: a framed still that comes alive as you scroll.
@@ -30,13 +32,16 @@ const MIN_SECONDS = 5;
  *     stage so it is pinned and released by exactly the same box as the frame;
  *   - a rate-limited progress driver. Raw scroll progress over the track is the
  *     target; a smoothed value follows it at no more than 1 / MIN_SECONDS per
- *     second. That value sets the video's currentTime and the type timeline, so
- *     a slow scroll is one to one and a fast flick still plays out over at least
- *     MIN_SECONDS. The video never autoplays or loops; scroll is the transport;
+ *     second and sets the video's currentTime, so a slow scroll is one to one
+ *     and a fast flick still plays the film out over at least MIN_SECONDS. The
+ *     type follows the same value but with a floor tied to raw scroll, so it is
+ *     always fully written by the time the scroll reaches the end of the travel:
+ *     nobody can flick past the hero without seeing the name. The video never
+ *     autoplays or loops; scroll is the transport;
  *   - a static poster composition for reduced motion and for video failure.
  *
  * Desktop pins for 320vh (mask over the first 260vh, a 60vh hold). Phones pin
- * for 220vh. Sources are chosen by device pixels: 4K on dense screens from
+ * for 280vh and bring the type in earlier. Sources are chosen by device pixels: 4K on dense screens from
  * 1100 CSS px, 1440p on dense screens below that or very wide standard screens,
  * 1080p otherwise, 540p on phones. All carry a keyframe every six frames.
  */
@@ -77,6 +82,7 @@ function Lockup() {
 export default function Hero() {
   const ref = useRef<HTMLElement>(null);
   const compact = useMediaQuery('(max-width: 640px)');
+  const touch = useMediaQuery('(pointer: coarse)');
   const dense = useMediaQuery('(min-resolution: 1.5dppx)');
   const wide = useMediaQuery('(min-width: 1100px)');
   const veryWide = useMediaQuery('(min-width: 1500px)');
@@ -119,6 +125,7 @@ export default function Hero() {
     video.pause();
 
     const motion = !prefersReducedMotion();
+    const minSeconds = touch ? MIN_SECONDS_TOUCH : MIN_SECONDS;
     const trackingRest = compact ? '0.3em' : '0.42em';
     const trackingWide = compact ? '0.5em' : '0.62em';
     let cancelled = false;
@@ -145,12 +152,13 @@ export default function Hero() {
       typeTl = gsap.timeline({ paused: true, defaults: { ease: 'none' } });
       typeTl.to({}, { duration: 1 }, 0);
       if (media) typeTl.to(media, { translate: '0 0%', duration: 0.8 }, 0);
+      const at = compact ? { brand: 0.14, title: 0.34, lede: 0.5, actions: 0.62 } : { brand: 0.24, title: 0.5, lede: 0.7, actions: 0.82 };
       typeTl
-        .to(brand, { opacity: 1, letterSpacing: trackingRest, y: 0, duration: 0.2, ease: 'power2.out' }, 0.24)
-        .to(titleLine, { yPercent: 0, duration: 0.16, ease: 'power3.out' }, 0.5)
-        .to(ledeLine, { yPercent: 0, duration: 0.14, ease: 'power3.out' }, 0.7)
-        .to(actions, { opacity: 1, y: 0, duration: 0.12, ease: 'power2.out' }, 0.82)
-        .set(actions, { pointerEvents: 'auto' }, 0.86);
+        .to(brand, { opacity: 1, letterSpacing: trackingRest, y: 0, duration: 0.2, ease: 'power2.out' }, at.brand)
+        .to(titleLine, { yPercent: 0, duration: 0.16, ease: 'power3.out' }, at.title)
+        .to(ledeLine, { yPercent: 0, duration: 0.14, ease: 'power3.out' }, at.lede)
+        .to(actions, { opacity: 1, y: 0, duration: 0.12, ease: 'power2.out' }, at.actions)
+        .set(actions, { pointerEvents: 'auto' }, at.actions + 0.04);
     });
 
     // Raw scroll progress over the track, the same geometry the component uses.
@@ -160,8 +168,11 @@ export default function Hero() {
       return gsap.utils.clamp(0, 1, -track.getBoundingClientRect().top / span);
     };
 
-    const apply = (p: number) => {
-      typeTl?.progress(p);
+    // The type's floor: by 92% of the raw travel it is complete, however fast the pass.
+    const typeFloor = (target: number) => gsap.utils.clamp(0, 1, (target - 0.5) / 0.42);
+
+    const apply = (p: number, target: number) => {
+      typeTl?.progress(Math.max(p, typeFloor(target)));
       const duration = video.duration;
       if (video.readyState >= 1 && Number.isFinite(duration) && duration > 0) {
         // Hold the first frame through the opening 10%, then advance to the end by 97%.
@@ -175,22 +186,24 @@ export default function Hero() {
 
     // Rate-limited follower: at most 1 / MIN_SECONDS of the travel per second.
     let smooth = readTarget();
+    let lastTarget = smooth;
     let last = performance.now();
-    apply(smooth);
+    apply(smooth, lastTarget);
     const tick = () => {
       const now = performance.now();
       const dt = Math.min(0.1, (now - last) / 1000);
       last = now;
       const target = readTarget();
-      const maxStep = motion ? dt / MIN_SECONDS : 1;
+      const maxStep = motion ? dt / minSeconds : 1;
       const delta = gsap.utils.clamp(-maxStep, maxStep, target - smooth);
-      if (delta === 0) return;
+      if (delta === 0 && target === lastTarget) return;
       smooth += delta;
-      apply(smooth);
+      lastTarget = target;
+      apply(smooth, target);
     };
     gsap.ticker.add(tick);
 
-    const onMeta = () => apply(smooth);
+    const onMeta = () => apply(smooth, lastTarget);
     const onError = () => setVideoFailed(true);
     video.addEventListener('loadedmetadata', onMeta);
     video.addEventListener('error', onError);
@@ -233,7 +246,7 @@ export default function Hero() {
       window.removeEventListener('touchstart', unlock);
       ctx.revert();
     };
-  }, [isStatic, src, stage, compact]);
+  }, [isStatic, src, stage, compact, touch]);
 
   if (isStatic) {
     return (
@@ -262,8 +275,8 @@ export default function Hero() {
         startRadius={22}
         endRadius={0}
         mediaZoom={1.08}
-        scrollDistance={compact ? 1.8 : 2.6}
-        holdDistance={compact ? 0.4 : 0.6}
+        scrollDistance={compact ? 2.2 : 2.6}
+        holdDistance={compact ? 0.6 : 0.6}
         smoothing={0.35}
         overlayScrim={0.55}
         useWindowScroll
